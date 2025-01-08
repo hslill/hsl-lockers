@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Transactions</title>
+    <link rel="stylesheet" href="css/styles-main.css">
+    <!-- Add Tablesort library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyC17BbuCs63DFzBdxnFFeO-Ejv1WECS7-E",
+            authDomain: "book-pickup-kiosk01.firebaseapp.com",
+            projectId: "book-pickup-kiosk01",
+            storageBucket: "book-pickup-kiosk01.firebasestorage.app",
+            messagingSenderId: "77991134959",
+            appId: "1:77991134959:web:28dde2b643a22bed6abd1a"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+    
+        async function searchTransactions(queryText) {
+    try {
+        console.log("Searching for:", queryText);
+
+        const resultsTable = document.getElementById("results-table").getElementsByTagName("tbody")[0];
+        resultsTable.innerHTML = ""; // Clear previous results
+        document.getElementById("total-results").innerText = "0"; // Reset the results count
+
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+
+        function formatDate(rawDate) {
+            const [date, timeWithTimezone] = rawDate.split('T');
+            const [time, timezone] = timeWithTimezone.split(/(?<=\d)(?=[A-Za-z])/);
+
+            const [year, month, day] = date.split('-');
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthName = months[parseInt(month, 10) - 1];
+            const formattedDate = `${monthName} ${day} ${year}`;
+            const timeWithoutSeconds = time.slice(0, 5);
+            return `${formattedDate}, ${timeWithoutSeconds} ${timezone}`;
+        }
+
+        const transactionsRef = collection(db, "transactions");
+        const transactionsSnapshot = await getDocs(transactionsRef);
+
+        const lockersRef = collection(db, "lockers");
+        const lockerSnapshot = await getDocs(lockersRef);
+
+        // Map locker numbers to their statuses for easy lookup
+        const lockerStatusMap = {};
+        lockerSnapshot.forEach((doc) => {
+            const data = doc.data();
+            lockerStatusMap[doc.id] = data.status === "in-use" ? "In Use" : "Available";
+        });
+
+        console.log("Locker Status Map:", lockerStatusMap);  // Debugging: Check the locker status map
+
+        let resultsFound = 0; // Track the number of results found
+
+        transactionsSnapshot.forEach((doc) => {
+            const data = doc.data();
+            const dateReceived = (typeof data.dateReceived === 'string') ? data.dateReceived.split('T')[0] : null;
+            const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
+            const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
+
+            if ((startDate && dateReceived && dateReceived < startDate) ||
+                (endDate && dateReceived && dateReceived > endDate)) {
+                return;
+            }
+
+            const fieldsToSearch = [
+                data.bookDetails,
+                data.recipientEmail,
+                data.recipientName,
+                doc.id
+            ];
+
+            const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+
+            if (matchesQuery) {
+                resultsFound++; // Increment the results counter
+                const row = resultsTable.insertRow();
+
+                // Fixing the lockerNumber lookup issue by adding the "locker_" prefix
+                const lockerStatusKey = `locker_${data.lockerNumber}`;  // Add "locker_" prefix
+                const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown"; // Lookup with the correct key
+
+                row.innerHTML = ` 
+                    <td>${data.lockerNumber}</td>
+                    <td>${doc.id}</td>
+                    <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                    <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                    <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td> <!-- Add Date Canceled here -->
+                    <td>${data.bookDetails || "N/A"}</td>
+                    <td>${data.recipientEmail || "N/A"}</td>
+                    <td>${data.recipientName || "N/A"}</td>
+                    <td>${lockerStatus}</td>
+                `;
+                console.log("Transaction found:", data);
+            }
+        });
+
+        // If no results were found in collections
+        if (resultsFound === 0) {
+            alert(`No results found for the entered search term: "${queryText}"`);
+        }
+
+        // Update the results count
+        document.getElementById("total-results").innerText = resultsFound;
+
+        // Initialize Tablesort
+        const table = document.getElementById("results-table");
+        const tablesort = new Tablesort(table);
+
+        // Add sortable class to headers for CSS styling
+        const headers = table.querySelectorAll("th");
+        headers.forEach(header => {
+            if (header.textContent !== "") { // Ensure it’s a valid header
+                header.classList.add("sortable");
+            }
+        });
+
+        table.addEventListener("beforeSort", function (e) {
+            // Log e.detail for debugging
+            console.log(e.detail);
+
+            if (e.detail && e.detail.direction) {
+                const th = e.target;
+                const isAsc = e.detail.direction === "asc";
+
+                // Remove previous indicator classes
+                headers.forEach(header => header.classList.remove("asc", "desc"));
+
+                // Add the new sorting direction class to the clicked column
+                th.classList.add(isAsc ? "asc" : "desc");
+            } 
+        });
+
+    } catch (error) {
+        console.error("Error searching transactions:", error);
+        alert("An error occurred while searching. Please check the console for more details.");
+    }
+}
+
+        document.getElementById("search-button").addEventListener("click", () => {
+            const queryText = document.getElementById("search-input").value.trim();
+            if (queryText) {
+                searchTransactions(queryText);
+            } else {
+                alert("Please enter a search term.");
+            }
+        });
+
+        // Add keyboard accessibility
+        document.getElementById("search-button").addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault(); // Prevent default behavior for space key
+                const queryText = document.getElementById("search-input").value.trim();
+                if (queryText) {
+                    searchTransactions(queryText);
+                } else {
+                    alert("Please enter a search term.");
+                }
+            }
+        });
+
+        // Attach the event listener to the button
+        const resetSearchButton = document.getElementById("resetSearchButton");
+        resetSearchButton.addEventListener("click", () => {
+            // Reload the page to reset the search
+            window.location.reload();
+        });
+
+        document.getElementById("homeLink").addEventListener("click", (event) => {
+            event.preventDefault();  // Prevent default anchor behavior
+            window.location.href = "index.html";  // Redirect to home page (adjust the URL as needed)
+        });
+
+// Export to CSV
+document.getElementById("export-csv").addEventListener("click", function () {
+    const table = document.getElementById("results-table");
+    const headers = table.querySelectorAll("thead th");
+    const rows = table.querySelectorAll("tbody tr");
+
+    // Extract headers
+    const headerData = [];
+    headers.forEach(header => {
+        headerData.push(header.textContent.trim());
+    });
+
+    const data = [headerData]; // Start the data array with headers
+
+    // Extract row data
+    rows.forEach(row => {
+        const rowData = [];
+        row.querySelectorAll("td").forEach(cell => {
+            rowData.push(cell.textContent.trim());
+        });
+        data.push(rowData);
+    });
+
+    // Use PapaParse to convert data to CSV and download
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'search_results.csv';
+    link.click();
+});
+
+
+// Export to PDF
+document.getElementById("export-pdf").addEventListener("click", function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'letter');  // Set portrait orientation (p), millimeters as units (mm), letter size
+    
+    const table = document.getElementById("results-table");
+    const rows = table.querySelectorAll("tbody tr");
+    
+    let y = 20;  // Start below the top margin
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Define margins with narrower left and right margins
+    const marginLeft = 10;   // Narrow left margin
+    const marginRight = 10;  // Narrow right margin
+    const marginTop = 20;   // Top margin
+    const marginBottom = 20;  // Bottom margin
+    
+    // Set font size to default (approx 10px)
+    doc.setFontSize(10);
+
+    // Function to wrap text and prevent overflow
+    function wrapText(text, maxWidth) {
+        return doc.splitTextToSize(text, maxWidth);
+    }
+
+    // Loop through each row in the table and format the output
+    rows.forEach(row => {
+        const rowData = {};
+        row.querySelectorAll("td").forEach((cell, index) => {
+            const header = [
+                "Locker #", 
+                "Transaction Number", 
+                "Date Received", 
+                "Date Picked Up",
+                "Date Canceled",
+                "Book Details", 
+                "Recipient Email", 
+                "Recipient", 
+                "Locker Status"
+            ][index]; // Define the headers based on the order in the table
+            rowData[header] = cell.textContent.trim(); // Store the data under its header
+        });
+
+        // Create each 'table' by printing each key-value pair
+        Object.keys(rowData).forEach((header, i) => {
+            const lineText = `${header} | ${rowData[header]}`;
+            const wrappedLine = wrapText(lineText, pageWidth - marginLeft - marginRight);
+            doc.text(wrappedLine, marginLeft, y);  // Apply left margin
+            y += wrappedLine.length * 2 + 5; // Space between rows
+            
+            // If the current section is "Book Details", add an extra space before the next section
+            if (header === "Book Details") {
+                y += 5; // Add extra space before printing "Recipient Email"
+            }
+            
+            // Check if the content exceeds the page height, and create a new page if necessary
+            if (y > pageHeight - marginBottom) {
+                doc.addPage();
+                y = marginTop;  // Reset the y position after page break
+            }
+        });
+
+        // Add some space between "tables"
+        y += 10;
+    });
+
+    // Save PDF
+    doc.save('search_results.pdf');
+});
+
+// Print Results
+document.getElementById("print-results").addEventListener("click", function () {
+    window.print();
+});
+
+
+    </script>
+    
+</head>
+<body id="search-page">
+    <header>
+        <h1>Search Transactions</h1>
+    </header>
+    <main>
+        <section id="search-section">
+            <input type="text" id="search-input" placeholder="Enter transaction details..." />
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" />
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" />
+            <button id="search-button">Search</button>
+        </section>
+        
+        <section id="results-section">
+            <table id="results-table" class="display">
+                <thead>
+                    <tr>
+                        <th>Locker #</th>
+                        <th>Transaction Number</th>
+                        <th>Date Received</th>
+                        <th>Date Picked Up</th>
+                        <th>Date Canceled</th>
+                        <th>Book Details</th>
+                        <th>Recipient Email</th>
+                        <th>Recipient</th>
+                        <th>Locker Status</th>
+                    </tr>
+                </thead>               
+                <tbody>
+                    <!-- Results will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <!-- Add a row to display results count -->
+            <div id="results-count">
+                <p>Total Results Found: <span id="total-results">0</span></p>
+            </div>
+        </section>
+                        <!-- Add buttons for CSV, PDF, and Print -->
+    <div id="export-buttons">
+        <button id="export-csv" class="btn">
+            <i class="fas fa-file-csv"></i> Export
+        </button>
+        <button id="export-pdf" class="btn">
+            <i class="fas fa-file-pdf"></i> Download
+        </button>
+        <button id="print-results" class="btn">
+            <i class="fas fa-print"></i> Print
+        </button>
+    </div>
+        <div id="buttonContainer">
+            <input type="button" id="resetSearchButton" name="Reset" value="Reset">
+            <a href="#" id="homeLink">Home</a>
+        </div>
+    </main>
+
+    <!-- Add Tablesort JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js"></script>
+    <!-- PapaParse for CSV Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<!-- jsPDF for PDF Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</body>
+</html>
