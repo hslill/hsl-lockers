@@ -59,7 +59,7 @@ function startInactivityTimer() {
     inactivityTimer = setTimeout(function() {
         // Create a simulated 'keydown' event to trigger the #closeAndClearButton
         const event = new KeyboardEvent('keydown', {
-            key: 'Enter', // You can set this to any key you want to trigger
+            key: 'click', // You can set this to any key you want to trigger
             bubbles: true
         });
 
@@ -70,8 +70,8 @@ function startInactivityTimer() {
 
 // Listen for the 'keydown' event
 document.addEventListener('keydown', (event) => {
-    // If the key is 'Enter' (or any key you wish to simulate from inactivity)
-    if (event.key === 'Enter') {
+    // If the key is 'click' // or any key you wish to simulate from inactivity)
+    if (event.key === 'click') {
         // Trigger the close and clear functionality
         const closeAndClearButton = document.getElementById('closeAndClearButton');
         if (closeAndClearButton) {
@@ -115,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-
         fetchLockerDetails(transactionNumber);
 
         // Show the popup
@@ -140,12 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Attach the combined functionality to the new button
     document.getElementById('closeAndClearButton')?.addEventListener('click', closeAndClearLockerStatus);
-
-    // Function to close the popup and reset the page
-    function closePopup() {
-        console.log("Popup closed");
-        resetPage();
-    }
 });
 
 // Combined function to close popup and clear locker status
