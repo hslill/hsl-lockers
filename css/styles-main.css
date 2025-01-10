@@ -414,3 +414,62 @@ th.sortable.desc::after {
 export-buttons .btn{
   transform: scale(0.98);
 }
+
+/* Style for the login modal */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 500px; /* Could be more or less, depending on screen size */
+}
+
+#logout-button {
+  all: unset; /* Removes default button styles */
+  position: fixed; /* Stays in the same position regardless of scrolling */
+  top: 10px; /* Adjust for spacing from the top */
+  right: 10px; /* Adjust for spacing from the right */
+  background-color: #580f8b;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#logout-button:hover {
+  color: #ae4cf5; /* Slightly darker on hover */
+  background-color: none;
+}
+
+.logoutButton #logout-button {
+  all: unset; /* Removes default button styles */
+  position: fixed; /* Stays in the same position regardless of scrolling */
+  top: 10px; /* Adjust for spacing from the top */
+  right: 10px; /* Adjust for spacing from the right */
+  background-color: white;
+  color: #580f8b;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.logoutButton #logout-button:hover {
+  color: #ae4cf5; /* Slightly darker on hover */
+  background-color: none;
+}
+
+label .login-form {
+  text-align: center;
+
+}
