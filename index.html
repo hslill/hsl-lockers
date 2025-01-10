@@ -3,726 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Locker Notification - Back-End</title>
+    <title>Search Transactions</title>
     <link rel="stylesheet" href="css/styles-main.css">
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-   <script type="text/javascript">
-        (function(){
-            emailjs.init("WyYEU_8XtbqQYPJzD"); 
-        })();
-    </script>
-</head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="search.html">Search Transactions</a></li>
-            <li><a href="user-index.html">User-end Page</a></li>
-        </ul>
-    </nav>
-      <!-- Content for logged-in users -->
-      <div id="content">
-        <button id="logout-button">Logout</button>
-      </div>
-    <!-- Login Form (Modal) -->
-<div id="login-form" class="modal">
-    <div class="modal-content">
-      <h2>Login</h2>
-      <form id="login-form-inner">
-        <label for="email">Email:</label>
-        <input type="email" id="email" required />
-        <label for="password">Password:</label>
-        <input type="password" id="password" required />
-        <button type="submit">Login</button>
-        <label for="login-form">For HSL Staff Only. Permission by request.</label>
-      </form>
-      
-      <p id="error-message" style="color: red;"></p>
-    </div>
-  </div>
-    
-    <h1>Book Locker Notification System</h1>
-
-    <div id="lockerStatus">
-        <h3>Locker Status</h3>
-        <ul id="lockerList"></ul>
-    </div>
-
-    <form id="notificationForm">
-        <label for="recipientName">Recipient Name:</label>
-        <input type="text" id="recipientNameField" name="recipientName" placeholder="Enter recipient's name" required>
-        
-        <input type="email" id="recipientEmailField" name="recipientEmail" placeholder="Recipient Email" required>
-
-        <label for="isbnNumber">ISBN Number:</label>
-        <input type="text" id="isbnNumber" name="isbnNumber" placeholder="Enter ISBN number">
-        <button type="button" id="lookupButton">Lookup Book</button>
-   
-        <label for="bookDetailsField">Book Details:</label>
-        <textarea id="bookDetailsField" name="bookDetails" placeholder="Enter book details" required></textarea>
-        <div id="bookDetailsContainer" style="margin-top: 10px;"></div>
-
-        <div id="isbnImageContainer" style="margin-top: 10px; display:none;">
-            <h3>Book Cover:</h3>
-            <img id="isbnImage" src="" alt="Book Image" style="max-width: 200px;">
+    <!-- Add Tablesort library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
+        <div class="logoutButton">
+          <!-- Content for logged-in users -->
+          <div id="content">
+            <button id="logout-button">Logout</button>
+          </div>
         </div>
-        
-        <label for="transactionNumberField">Transaction Number:</label>
-        <input type="text" id="transactionNumberField" name="transactionNumberField" placeholder="Transaction Number (TN)" maxlength="8" required>
-        
-        <!-- New button for assigning locker -->
-        <button type="button" id="assignLockerButton">Assign Locker</button>
-        
-        <!-- Hidden fields for locker number and combination -->
-        <input type="hidden" id="lockerNumberField" name="lockerNumber">
-        <input type="hidden" id="combinationField" name="combination">
-          
-        <button type="submit" id="sendButton">Send</button>
-        <button type="reset" id="resetButton">Reset</button>
-    </form>  
-
-    <!-- Spinner for loading -->
-    <div id="loadingIndicator" style="display:none;">Loading...</div>
-
-    <!-- Success or Failure Notifications -->
-    <div id="statusMessage" style="display:none;"></div>
-
-    <div id="emailPreviewContainer">
-        <h2>Email Preview:</h2>
-        <div id="emailPreview" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;"></div>
-    </div>
-
-        <!-- Popup container for showing locker details -->
-        <div id="popup" class="popup">
-            <div class="popup-content">
-                <p><strong>Recipient Name:</strong> <span id="popupRecipientName"></span></p>
-                <p><strong>Email:</strong> <span id="popupRecipientEmail"></span></p>
-                <p><strong>Book Details:</strong> <span id="popupBookDetails"></span></p>
-                <p><strong>Transaction Number:</strong> <span id="popupTransactionNumber"></span></p>
-            </div>
-        </div> 
-        <div id="lockerDetails"></div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyC17BbuCs63DFzBdxnFFeO-Ejv1WECS7-E",
-        authDomain: "book-pickup-kiosk01.firebaseapp.com",
-        projectId: "book-pickup-kiosk01",
-        storageBucket: "book-pickup-kiosk01.firebasestorage.app",
-        messagingSenderId: "77991134959",
-        appId: "1:77991134959:web:28dde2b643a22bed6abd1a"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const auth = getAuth(app); // Initialize Firebase Authentication
     
-// Function to show the popup with locker details
-let isLockerStatusFetched = false;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js"; // Import Firebase Auth
 
-async function fetchLockerStatus() {
-    if (isLockerStatusFetched) return; // Guard to prevent fetching again
-    isLockerStatusFetched = true;
-
-    const lockerList = document.getElementById('lockerList');
-    if (!lockerList) {
-        console.error("Locker list container is missing in the HTML.");
-        return;
-    }
-
-    lockerList.innerHTML = ''; // Clear the list before adding new data
-
-    try {
-        const querySnapshot = await getDocs(collection(db, "lockers"));
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const status = data.status || 'available'; // Default to 'available' if no status is found
-            const lockerNumber = data.lockerNumber;
-
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                <span style="font-weight: bold;">Locker ${lockerNumber}:</span>
-                <span class="status-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ${status === 'available' ? 'green' : 'red'}; margin-left: 10px;"></span>
-                <span style="margin-left: 5px;">${status}</span>
-            `;
-
-            // Show the popup on hover (only for non-available lockers)
-            listItem.addEventListener('mouseover', (event) => {
-                if (status !== 'available') {
-                    showPopup(event, data);  // Pass locker data to the popup function
-                }
-            });
-
-            // Hide the popup when mouse leaves
-            listItem.addEventListener('mouseleave', () => {
-                hidePopup();
-            });
-
-// Add cancel button for lockers that are in-use
-if (status === 'in-use') {
-    const cancelButton = document.createElement('span');
-    cancelButton.textContent = 'cancel';
-    cancelButton.style.color = 'red';
-    cancelButton.style.cursor = 'pointer';
-    cancelButton.style.marginLeft = '10px';
-
-    cancelButton.addEventListener('click', async (e) => {
-        e.stopPropagation(); // Prevent the click from triggering the locker contents popup
-        
-        // Show confirmation dialog
-        const isConfirmed = window.confirm('Are you sure you want to cancel?');
-
-        if (isConfirmed) {
-            // If confirmed, cancel the locker request
-            await cancelLockerRequest(lockerNumber);  
-
-                        // Refresh the page after canceling
-            window.location.reload();
-        }
-    });
-    
-    listItem.appendChild(cancelButton);
-}
-
-lockerList.appendChild(listItem);
-
-        });
-
-    } catch (error) {
-        console.error("Error fetching locker data:", error);
-    }
-}
-
-// Function to show the locker contents popup
-async function showPopup(event, lockerData) {
-    const popup = document.getElementById('popup');
-    const popupRecipientName = document.getElementById('popupRecipientName');
-    const popupRecipientEmail = document.getElementById('popupRecipientEmail');
-    const popupBookDetails = document.getElementById('popupBookDetails');
-    const popupTransactionNumber = document.getElementById('popupTransactionNumber');
-
-    // Populate popup fields
-    popupRecipientName.textContent = lockerData.recipientName || 'N/A';
-    popupRecipientEmail.textContent = lockerData.recipientEmail || 'N/A';
-    popupBookDetails.textContent = lockerData.bookDetails || 'N/A';
-    popupTransactionNumber.textContent = lockerData.transactionNumber || 'N/A';
-
-    // Position the popup relative to the list item
-    const listItem = event.target;
-    const rect = listItem.getBoundingClientRect();
-    popup.style.top = rect.top + window.scrollY + listItem.offsetHeight + 5 + 'px';
-    popup.style.left = rect.left + window.scrollX + 'px';
-
-    // Show the popup
-    popup.style.display = 'block';
-
-    // Fetch additional locker details from Firestore (optional)
-    const lockerRef = doc(db, "lockers", `locker_${lockerData.lockerNumber}`);
-    try {
-        const lockerDoc = await getDoc(lockerRef);
-        if (lockerDoc.exists()) {
-            const lockerDataFromDB = lockerDoc.data();
-            const isbnImageURL = lockerDataFromDB.isbnImageURL;
-
-            // If ISBN image exists, display it in the popup
-            if (isbnImageURL) {
-                const lockerDetailsContainer = document.getElementById('lockerDetails');
-                if (lockerDetailsContainer) {
-                    lockerDetailsContainer.innerHTML = ''; // Clear existing image
-
-                    const imgElement = document.createElement('img');
-                    imgElement.src = isbnImageURL;
-                    imgElement.alt = 'ISBN Image';
-                    imgElement.style.maxWidth = '200px'; // Optional size limit
-
-                    lockerDetailsContainer.appendChild(imgElement);
-                } else {
-                    console.error("Element with ID 'lockerDetails' not found.");
-                }
-            } else {
-                console.log("No ISBN image URL found for this locker.");
-            }
-        } else {
-            console.error("Locker document does not exist.");
-        }
-    } catch (error) {
-        console.error("Error fetching locker data:", error);
-    }
-}
-
-// Function to hide the popup
-function hidePopup() {
-    const popup = document.getElementById('popup');
-    popup.style.display = 'none'; // Hide the popup
-}
-
-// Function to cancel locker request
-async function cancelLockerRequest(lockerNumber) {
-    try {
-        // Retrieve the locker document
-        const lockerRef = doc(db, "lockers", `locker_${lockerNumber}`);
-        const lockerDoc = await getDoc(lockerRef);
-
-        if (!lockerDoc.exists()) {
-            console.error("Locker not found!");
-            return;
-        }
-
-        const lockerData = lockerDoc.data();
-        const transactionNumber = lockerData.transactionNumber; // Get the associated transaction number
-        
-        if (!transactionNumber) {
-            console.error("No transaction number found for this locker.");
-            return;
-        }
-
-        // Update locker status to 'available'
-        await updateDoc(lockerRef, { status: '', transactionNumber: '' }); // Remove the transaction number
-        console.log(`Locker ${lockerNumber} request canceled.`);
-
-        // Call the function to update the transaction document with the cancellation date
-        await cancelTransaction(transactionNumber);
-
-        fetchLockerStatus();  // Re-fetch locker data to reflect the change
-    } catch (error) {
-        console.error("Error canceling locker request:", error);
-    }
-}
-
-async function cancelTransaction(transactionNumber) {
-    const currentDate = new Date(); // Get current date when the transaction is canceled
-
-    // Reference to the specific transaction in the "transactions" collection
-    const transactionRef = doc(db, 'transactions', transactionNumber);
-
-    try {
-        // Update the transaction with the dateCanceled field
-        await updateDoc(transactionRef, {
-            dateCanceled: currentDate // Add cancellation date to the document
-        });
-        console.log('Transaction canceled and dateCanceled added.');
-    } catch (error) {
-        console.error('Error canceling transaction:', error);
-    }
-}
-
-// Barcode input event handling
-document.getElementById('transactionNumberField').addEventListener('keydown', function(event) {
-    if (typeof event.key === 'string' && (event.key.length === 1 || event.key === 'Enter')) {
-        event.preventDefault();
-        if (event.key === 'Enter') {
-            console.log('Final barcode:', event.target.value);
-            return;
-        }
-        event.target.value += event.key;
-        console.log('Current barcode input:', event.target.value);
-    }
-});
-
-// Format date to Eastern Time
-function formatDateTimeToEastern(date) {
-    const options = {
-        timeZone: 'America/New_York',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-    };
-    
-    const formatter = new Intl.DateTimeFormat('en-US', options);
-    const parts = formatter.formatToParts(date);
-    
-    const year = parts.find(p => p.type === 'year').value;
-    const month = parts.find(p => p.type === 'month').value;
-    const day = parts.find(p => p.type === 'day').value;
-    const hour = parts.find(p => p.type === 'hour').value;
-    const minute = parts.find(p => p.type === 'minute').value;
-    const second = parts.find(p => p.type === 'second').value;
-    const ampm = parts.find(p => p.type === 'dayPeriod').value.toUpperCase();
-    const offset = new Date().toLocaleTimeString('en-US', {
-        timeZone: 'America/New_York',
-        timeZoneName: 'short'
-    }).split(' ')[2]; // Example: "EST" becomes "-05:00"
-
-    return `${year}-${month}-${day}T${hour}:${minute}:${second}${ampm}-${offset}`;
-}
-
-// Handle notification form submission
-document.getElementById('notificationForm').addEventListener('submit', async function(event) {
-    event.preventDefault(); 
-
-    const transactionNumber = document.getElementById('transactionNumberField').value.trim();
-    const recipientName = document.getElementById('recipientNameField').value.trim();
-    const recipientEmail = document.getElementById('recipientEmailField').value.trim();
-    const bookDetails = document.getElementById('bookDetailsField').value.trim();
-
-    const lockerNumber = window.lockerNumber;
-    const combination = window.combination;
-
-    if (!transactionNumber || !recipientName || !bookDetails || !lockerNumber || !combination) {
-        return;
-    }
-
-    const lockerRef = doc(db, "lockers", `locker_${lockerNumber}`);
-    try {
-        const lockerDoc = await getDoc(lockerRef);
-        if (!lockerDoc.exists()) {
-            alert(`Locker ${lockerNumber} not found.`);
-            return;
-        }
-
-        const lockerData = lockerDoc.data();
-        const status = lockerData.status || 'available';
-
-        if (status !== 'available') {
-            alert(`Locker ${lockerNumber} is currently in use.`);
-            return;
-        }
-
-        document.getElementById('loadingIndicator').style.display = 'block';
-
-        await setDoc(
-            lockerRef,
-            { 
-                status: 'in-use',
-                transactionNumber: transactionNumber,
-                recipientName: recipientName,
-                recipientEmail: recipientEmail,
-                bookDetails: bookDetails,
-            },
-            { merge: true }
-        );
-
-        const imageUrl = await fetchBookImage(extractISBN(bookDetails)); // Fetch image URL
-
-        if (imageUrl) {
-            await setDoc(
-                lockerRef,
-                { isbnImageURL: imageUrl },
-                { merge: true }
-            );
-        }
-
-        const transactionRef = doc(db, 'transactions', transactionNumber);
-        const transactionData = {
-            lockerNumber: lockerNumber,
-            combination: combination,
-            recipientName: recipientName,
-            recipientEmail: recipientEmail,
-            bookDetails: bookDetails,
-            dateReceived: formatDateTimeToEastern(new Date()), // Add the formatted date
-            dateCanceled: formatDateTimeToEastern(new Date())
+        const firebaseConfig = {
+            apiKey: "AIzaSyC17BbuCs63DFzBdxnFFeO-Ejv1WECS7-E",
+            authDomain: "book-pickup-kiosk01.firebaseapp.com",
+            projectId: "book-pickup-kiosk01",
+            storageBucket: "book-pickup-kiosk01.firebasestorage.app",
+            messagingSenderId: "77991134959",
+            appId: "1:77991134959:web:28dde2b643a22bed6abd1a"
         };
-
-        await setDoc(transactionRef, transactionData);
-        console.log('Transaction saved to Firestore:', transactionNumber);
-
-        showStatusMessage('Transaction saved successfully! Email sent!', 'success');
-        
-    } catch (error) {
-        showStatusMessage('Error saving transaction data. Please try again.', 'error');
-        console.error('Error:', error);
-    } finally {
-        document.getElementById('loadingIndicator').style.display = 'none';
-    }
-});
-
-// Function to fetch book image from an API
-async function fetchBookImage(isbn) {
-    try {
-        const response = await fetch(`https://covers.openlibrary.org/b/ISBN/${isbn}-L.jpg`);
-        if (response.ok) {
-            return response.url; // This is the URL of the book image
-        }
-        return null; // Return null if the image is not found
-    } catch (error) {
-        console.error('Error fetching book image:', error);
-        return null;
-    }
-}
-
-// Function to extract ISBN from book details (you may need to modify this based on your data format)
-function extractISBN(bookDetails) {
-    // Example: Extracting ISBN (you might need a more complex approach based on your input format)
-    const match = bookDetails.match(/\b\d{10}(\d{3})?\b/);
-    return match ? match[0] : null;
-}
-
-
- // Handle locker assignment only on assignLockerButton click
-document.getElementById('assignLockerButton').addEventListener('click', async () => {
-    const lockerRef = collection(db, "lockers");
-    try {
-        // Fetch all locker data
-        const querySnapshot = await getDocs(lockerRef);
-        let availableLocker = null;
-
-        // Iterate over each locker to check for availability
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            if (data.status === "" || data.status === 'available') {
-                availableLocker = data.lockerNumber;
-                return; // Break the loop once an available locker is found
-            }
-        });
-
-        if (availableLocker) {
-            // If an available locker is found, assign it to the hidden locker number field
-            document.getElementById('lockerNumberField').value = availableLocker;
-            window.lockerNumber = availableLocker;  // Update the global locker number
-            alert(`Locker ${availableLocker} has been assigned.`);
-            
-            // Call the function to update the email preview with the new locker number
-            generateLockerAndCombination();  // This will ensure email preview reflects the correct locker number
-
-        } else {
-            // If no available lockers, show an alert
-            alert('No available lockers at the moment.');
-        }
-    } catch (error) {
-        console.error("Error fetching locker data:", error);
-        alert("Failed to fetch locker data. Please try again.");
-    }
-});
-
-        // Initialize locker statuses on page load
-        window.onload = fetchLockerStatus;
-
-    // Prevent barcode scanner default behavior
-    document.getElementById('isbnNumber').addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            document.getElementById('lookupButton').click();
-        }
-    });
     
-    // Book lookup by ISBN
-    document.getElementById('lookupButton').addEventListener('click', () => {
-    const isbn = document.getElementById('isbnNumber').value;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); // Initialize Firebase Auth
 
-    if (!isbn.trim()) {
-        alert("Please enter a valid ISBN number.");
-        return;
-    }
-
-    const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`;
-    fetch(apiUrl)
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.items && data.items.length > 0) {
-                const book = data.items[0].volumeInfo;
-                const bookDetails = `Title: ${book.title || 'N/A'}\nAuthor(s): ${book.authors ? book.authors.join(', ') : 'N/A'}\nPublisher: ${book.publisher || 'N/A'}\nPublished Date: ${book.publishedDate || 'N/A'}`;
-
-                // Add book details to the main text area
-                const bookDetailsField = document.getElementById('bookDetailsField');
-                bookDetailsField.value += `${bookDetails}\n\n`; // Append to existing content
-
-                // Display book details dynamically
-                displayBookDetails(book);
-
-                // Clear the ISBN input field
-                document.getElementById('isbnNumber').value = '';
+                // Check authentication status
+                onAuthStateChanged(auth, user => {
+            if (!user) {
+                // If the user is not authenticated, redirect to login page (index.html)
+                window.location.href = 'index.html';
             } else {
-                alert('No book found with the given ISBN.');
+                // User is authenticated, proceed with loading the page
+                console.log("User is authenticated:", user.email);
             }
-        })
-        .catch((error) => {
-            console.error('Error fetching data:', error);
-            alert('An error occurred while fetching the book data.');
         });
-});
 
-function displayBookDetails(book) {
-    // Create a new entry for the book
-    const entryDiv = document.createElement('div');
-    entryDiv.classList.add('book-entry');
-
-    // Title and author
-    const titleElement = document.createElement('p');
-    titleElement.textContent = `Title: ${book.title || 'N/A'}`;
-    entryDiv.appendChild(titleElement);
-
-    const authorElement = document.createElement('p');
-    authorElement.textContent = `Author(s): ${book.authors ? book.authors.join(', ') : 'N/A'}`;
-    entryDiv.appendChild(authorElement);
-
-    // Publisher and published date
-    const publisherElement = document.createElement('p');
-    publisherElement.textContent = `Publisher: ${book.publisher || 'N/A'}`;
-    entryDiv.appendChild(publisherElement);
-
-    const publishedDateElement = document.createElement('p');
-    publishedDateElement.textContent = `Published Date: ${book.publishedDate || 'N/A'}`;
-    entryDiv.appendChild(publishedDateElement);
-
-    // Add cover image if available
-    if (book.imageLinks && book.imageLinks.thumbnail) {
-        const imgElement = document.createElement('img');
-        imgElement.src = book.imageLinks.thumbnail;
-        imgElement.alt = `Cover of ${book.title}`;
-        imgElement.style.maxWidth = '150px';  // Adjust size as needed
-        entryDiv.appendChild(imgElement);
-    }
-
-    // Add transaction number (optional: if needed)
-    const transactionElement = document.createElement('p');
-    transactionElement.textContent = `ISBN or Other Book ID: ${book.industryIdentifiers ? book.industryIdentifiers[0].identifier : 'N/A'}`;
-    entryDiv.appendChild(transactionElement);
-
-    // Append this new entry to the book details container
-    const bookDetailsContainer = document.getElementById('bookDetailsContainer');
-    bookDetailsContainer.appendChild(entryDiv);
-
-
-    // Clear the ISBN input field
-    document.getElementById('isbnNumber').value = '';
-}
-
-// Handle login
-// Function to show the login form modal
-function showLoginModal() {
-    const loginModal = document.getElementById('login-form');
-    if (loginModal) {
-        loginModal.style.display = 'block'; // Show the modal
-    }
-}
-
-// Function to hide the login form modal
-function hideLoginModal() {
-    const loginModal = document.getElementById('login-form');
-    if (loginModal) {
-        loginModal.style.display = 'none'; // Hide the modal
-    }
-}
-
-// Handling form submission and login
-document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessage = document.getElementById('error-message');
-    
+        async function searchTransactions(queryText) {
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-        hideLoginModal();
-        document.getElementById('content').style.display = 'block';
-    } catch (error) {
-        switch (error.code) {
-            case 'auth/user-not-found':
-                errorMessage.textContent = 'No user found with this email.';
-                break;
-            case 'auth/wrong-password':
-                errorMessage.textContent = 'Incorrect password.';
-                break;
-            case 'auth/invalid-email':
-                errorMessage.textContent = 'Invalid email format.';
-                break;
-            default:
-                errorMessage.textContent = 'Login failed. Please try again.';
+        console.log("Searching for:", queryText);
+
+        const resultsTable = document.getElementById("results-table").getElementsByTagName("tbody")[0];
+        resultsTable.innerHTML = ""; // Clear previous results
+        document.getElementById("total-results").innerText = "0"; // Reset the results count
+
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+
+        function formatDate(rawDate) {
+            const [date, timeWithTimezone] = rawDate.split('T');
+            const [time, timezone] = timeWithTimezone.split(/(?<=\d)(?=[A-Za-z])/);
+
+            const [year, month, day] = date.split('-');
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthName = months[parseInt(month, 10) - 1];
+            const formattedDate = `${monthName} ${day} ${year}`;
+            const timeWithoutSeconds = time.slice(0, 5);
+            return `${formattedDate}, ${timeWithoutSeconds} ${timezone}`;
         }
+
+        const transactionsRef = collection(db, "transactions");
+        const transactionsSnapshot = await getDocs(transactionsRef);
+
+        const lockersRef = collection(db, "lockers");
+        const lockerSnapshot = await getDocs(lockersRef);
+
+        // Map locker numbers to their statuses for easy lookup
+        const lockerStatusMap = {};
+        lockerSnapshot.forEach((doc) => {
+            const data = doc.data();
+            lockerStatusMap[doc.id] = data.status === "in-use" ? "In Use" : "Available";
+        });
+
+        console.log("Locker Status Map:", lockerStatusMap);  // Debugging: Check the locker status map
+
+        let resultsFound = 0; // Track the number of results found
+
+        transactionsSnapshot.forEach((doc) => {
+            const data = doc.data();
+            const dateReceived = (typeof data.dateReceived === 'string') ? data.dateReceived.split('T')[0] : null;
+            const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
+            const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
+
+            if ((startDate && dateReceived && dateReceived < startDate) ||
+                (endDate && dateReceived && dateReceived > endDate)) {
+                return;
+            }
+
+            const fieldsToSearch = [
+                data.bookDetails,
+                data.recipientEmail,
+                data.recipientName,
+                doc.id
+            ];
+
+            const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+
+            if (matchesQuery) {
+                resultsFound++; // Increment the results counter
+                const row = resultsTable.insertRow();
+
+                // Fixing the lockerNumber lookup issue by adding the "locker_" prefix
+                const lockerStatusKey = `locker_${data.lockerNumber}`;  // Add "locker_" prefix
+                const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown"; // Lookup with the correct key
+
+                row.innerHTML = ` 
+                    <td>${data.lockerNumber}</td>
+                    <td>${doc.id}</td>
+                    <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                    <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                    <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td> <!-- Add Date Canceled here -->
+                    <td>${data.bookDetails || "N/A"}</td>
+                    <td>${data.recipientEmail || "N/A"}</td>
+                    <td>${data.recipientName || "N/A"}</td>
+                    <td>${lockerStatus}</td>
+                `;
+                console.log("Transaction found:", data);
+            }
+        });
+
+        // If no results were found in collections
+        if (resultsFound === 0) {
+            alert(`No results found for the entered search term: "${queryText}"`);
+        }
+
+        // Update the results count
+        document.getElementById("total-results").innerText = resultsFound;
+
+        // Initialize Tablesort
+        const table = document.getElementById("results-table");
+        const tablesort = new Tablesort(table);
+
+        // Add sortable class to headers for CSS styling
+        const headers = table.querySelectorAll("th");
+        headers.forEach(header => {
+            if (header.textContent !== "") { // Ensure it’s a valid header
+                header.classList.add("sortable");
+            }
+        });
+
+        table.addEventListener("beforeSort", function (e) {
+            // Log e.detail for debugging
+            console.log(e.detail);
+
+            if (e.detail && e.detail.direction) {
+                const th = e.target;
+                const isAsc = e.detail.direction === "asc";
+
+                // Remove previous indicator classes
+                headers.forEach(header => header.classList.remove("asc", "desc"));
+
+                // Add the new sorting direction class to the clicked column
+                th.classList.add(isAsc ? "asc" : "desc");
+            } 
+        });
+
+    } catch (error) {
+        console.error("Error searching transactions:", error);
+        alert("An error occurred while searching. Please check the console for more details.");
     }
+}
+
+        document.getElementById("search-button").addEventListener("click", () => {
+            const queryText = document.getElementById("search-input").value.trim();
+            if (queryText) {
+                searchTransactions(queryText);
+            } else {
+                alert("Please enter a search term.");
+            }
+        });
+
+        // Add keyboard accessibility
+        document.getElementById("search-button").addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault(); // Prevent default behavior for space key
+                const queryText = document.getElementById("search-input").value.trim();
+                if (queryText) {
+                    searchTransactions(queryText);
+                } else {
+                    alert("Please enter a search term.");
+                }
+            }
+        });
+
+        // Attach the event listener to the button
+        const resetSearchButton = document.getElementById("resetSearchButton");
+        resetSearchButton.addEventListener("click", () => {
+            // Reload the page to reset the search
+            window.location.reload();
+        });
+
+        document.getElementById("homeLink").addEventListener("click", (event) => {
+            event.preventDefault();  // Prevent default anchor behavior
+            window.location.href = "index.html";  // Redirect to home page (adjust the URL as needed)
+        });
+
+// Export to CSV
+document.getElementById("export-csv").addEventListener("click", function () {
+    const table = document.getElementById("results-table");
+    const headers = table.querySelectorAll("thead th");
+    const rows = table.querySelectorAll("tbody tr");
+
+    // Extract headers
+    const headerData = [];
+    headers.forEach(header => {
+        headerData.push(header.textContent.trim());
+    });
+
+    const data = [headerData]; // Start the data array with headers
+
+    // Extract row data
+    rows.forEach(row => {
+        const rowData = [];
+        row.querySelectorAll("td").forEach(cell => {
+            rowData.push(cell.textContent.trim());
+        });
+        data.push(rowData);
+    });
+
+    // Use PapaParse to convert data to CSV and download
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'search_results.csv';
+    link.click();
 });
 
-window.onload = function () {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('content').style.display = 'block';
-        } else {
-            showLoginModal();
-        }
+
+// Export to PDF
+document.getElementById("export-pdf").addEventListener("click", function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'letter');  // Set portrait orientation (p), millimeters as units (mm), letter size
+    
+    const table = document.getElementById("results-table");
+    const rows = table.querySelectorAll("tbody tr");
+    
+    let y = 20;  // Start below the top margin
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Define margins with narrower left and right margins
+    const marginLeft = 10;   // Narrow left margin
+    const marginRight = 10;  // Narrow right margin
+    const marginTop = 20;   // Top margin
+    const marginBottom = 20;  // Bottom margin
+    
+    // Set font size to default (approx 10px)
+    doc.setFontSize(10);
+
+    // Function to wrap text and prevent overflow
+    function wrapText(text, maxWidth) {
+        return doc.splitTextToSize(text, maxWidth);
+    }
+
+    // Loop through each row in the table and format the output
+    rows.forEach(row => {
+        const rowData = {};
+        row.querySelectorAll("td").forEach((cell, index) => {
+            const header = [
+                "Locker #", 
+                "Transaction Number", 
+                "Date Received", 
+                "Date Picked Up",
+                "Date Canceled",
+                "Book Details", 
+                "Recipient Email", 
+                "Recipient", 
+                "Locker Status"
+            ][index]; // Define the headers based on the order in the table
+            rowData[header] = cell.textContent.trim(); // Store the data under its header
+        });
+
+        // Create each 'table' by printing each key-value pair
+        Object.keys(rowData).forEach((header, i) => {
+            const lineText = `${header} | ${rowData[header]}`;
+            const wrappedLine = wrapText(lineText, pageWidth - marginLeft - marginRight);
+            doc.text(wrappedLine, marginLeft, y);  // Apply left margin
+            y += wrappedLine.length * 2 + 5; // Space between rows
+            
+            // If the current section is "Book Details", add an extra space before the next section
+            if (header === "Book Details") {
+                y += 5; // Add extra space before printing "Recipient Email"
+            }
+            
+            // Check if the content exceeds the page height, and create a new page if necessary
+            if (y > pageHeight - marginBottom) {
+                doc.addPage();
+                y = marginTop;  // Reset the y position after page break
+            }
+        });
+
+        // Add some space between "tables"
+        y += 10;
     });
-};
+
+    // Save PDF
+    doc.save('search_results.pdf');
+});
+
+// Print Results
+document.getElementById("print-results").addEventListener("click", function () {
+    window.print();
+});
 
 // Handle logout
 document.getElementById('logout-button').addEventListener('click', async () => {
     try {
         await signOut(auth);
         document.getElementById('content').style.display = 'none';
-        showLoginModal();
     } catch (error) {
         console.error("Error logging out:", error.message);
     }
 });
 
-// Streamlined login logic, ensuring only login and logout functionalities remain
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-    } else {
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('content').style.display = 'none';
-    }
-});
-
-// Function to log in a user
-function logIn(email, password) {
-  auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log("User logged in:", user);
-    })
-    .catch((error) => {
-      console.error("Error logging in:", error.message);
-    });
-}
-
-// Function to log out the user
-function logOut() {
-  auth.signOut()
-    .then(() => {
-      console.log("User logged out");
-    })
-    .catch((error) => {
-      console.error("Error logging out:", error.message);
-    });
-}
-
-// Helper function to show success or error messages
-function showStatusMessage(message, type) {
-    const statusMessageElement = document.getElementById('statusMessage');
-    statusMessageElement.innerText = message;
-    statusMessageElement.style.color = type === 'success' ? 'green' : 'red';
-    statusMessageElement.style.display = 'block';
-}
-
-    // Send button click action
-    document.getElementById('sendButton').addEventListener('click', function () {
-        // Perform send action (e.g., sending email)
-        sendEmail();
-
-    });
-
-// Reset page function
-function resetPage() {
-    document.getElementById('notificationForm').reset();
-    document.getElementById('isbnImage').src = ''; // Reset the ISBN image
-    document.getElementById('isbnImageContainer').style.display = 'none'; // Hide the ISBN image container
-    location.reload(); // This reloads the entire page
-}
-
-// Add event listener to reset button
-document.getElementById('resetButton').addEventListener('click', function () {
-    resetPage();
-});
-
     </script>
-        <!-- JavaScript files -->
-        <script src="js/generateBarcode.js"></script>
-        <script src="js/previewEmail.js"></script>
-        <script src="js/sendEmail.js"></script>
-        <script src="js/barcodeUtils.js"></script>
+    
+</head>
+<body id="search-page">
+    <header>
+        <h1>Search Transactions</h1>
+    </header>
+    <main>
+        <section id="search-section">
+            <input type="text" id="search-input" placeholder="Enter transaction details..." />
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" />
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" />
+            <button id="search-button">Search</button>
+        </section>
+        
+        <section id="results-section">
+            <table id="results-table" class="display">
+                <thead>
+                    <tr>
+                        <th>Locker #</th>
+                        <th>Transaction Number</th>
+                        <th>Date Received</th>
+                        <th>Date Picked Up</th>
+                        <th>Date Canceled</th>
+                        <th>Book Details</th>
+                        <th>Recipient Email</th>
+                        <th>Recipient</th>
+                        <th>Locker Status</th>
+                    </tr>
+                </thead>               
+                <tbody>
+                    <!-- Results will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <!-- Add a row to display results count -->
+            <div id="results-count">
+                <p>Total Results Found: <span id="total-results">0</span></p>
+            </div>
+        </section>
+                        <!-- Add buttons for CSV, PDF, and Print -->
+    <div id="export-buttons">
+        <button id="export-csv" class="btn">
+            <i class="fas fa-file-csv"></i> Export
+        </button>
+        <button id="export-pdf" class="btn">
+            <i class="fas fa-file-pdf"></i> Download
+        </button>
+        <button id="print-results" class="btn">
+            <i class="fas fa-print"></i> Print
+        </button>
+    </div>
+        <div id="buttonContainer">
+            <input type="button" id="resetSearchButton" name="Reset" value="Reset">
+            <a href="#" id="homeLink">Home</a>
+        </div>
+    </main>
+
+    <!-- Add Tablesort JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js"></script>
+    <!-- PapaParse for CSV Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<!-- jsPDF for PDF Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<script src="firebase-functions.js"></script>
 
 </body>
 </html>
