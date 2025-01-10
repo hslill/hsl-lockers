@@ -35,7 +35,8 @@
         <input type="email" id="email" required />
         <label for="password">Password:</label>
         <input type="password" id="password" required />
-        <button type="submit">Login</button>
+        <button type="submit" id="login-button">Login</button>
+
         <label for="login-form">For HSL Staff Only. Permission by request.</label>
       </form>
       
@@ -304,11 +305,14 @@ async function cancelTransaction(transactionNumber) {
     const transactionRef = doc(db, 'transactions', transactionNumber);
 
     try {
-        // Update the transaction with the dateCanceled field
+        // Format the date as a string
+        const formattedDate = formatDateTimeToEastern(currentDate);
+
+        // Update the transaction with the dateCanceled field as a string
         await updateDoc(transactionRef, {
-            dateCanceled: currentDate // Add cancellation date to the document
+            dateCanceled: formattedDate
         });
-        console.log('Transaction canceled and dateCanceled added.');
+        console.log('Transaction canceled and dateCanceled added as a string.');
     } catch (error) {
         console.error('Error canceling transaction:', error);
     }
