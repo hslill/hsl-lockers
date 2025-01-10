@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="css/styles-main.css">
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script type="text/javascript">
+
+   <script type="text/javascript">
         (function(){
             emailjs.init("WyYEU_8XtbqQYPJzD"); 
         })();
@@ -21,6 +22,26 @@
             <li><a href="user-index.html">User-end Page</a></li>
         </ul>
     </nav>
+      <!-- Content for logged-in users -->
+      <div id="content">
+        <button id="logout-button">Logout</button>
+      </div>
+    <!-- Login Form (Modal) -->
+<div id="login-form" class="modal">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <form id="login-form-inner">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required />
+        <label for="password">Password:</label>
+        <input type="password" id="password" required />
+        <button type="submit">Login</button>
+        <label for="login-form">For HSL Staff Only. Permission by request.</label>
+      </form>
+      
+      <p id="error-message" style="color: red;"></p>
+    </div>
+  </div>
     
     <h1>Book Locker Notification System</h1>
 
@@ -88,6 +109,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
     import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC17BbuCs63DFzBdxnFFeO-Ejv1WECS7-E",
@@ -101,6 +123,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
+    const auth = getAuth(app); // Initialize Firebase Authentication
     
 // Function to show the popup with locker details
 let isLockerStatusFetched = false;
@@ -566,6 +589,105 @@ function displayBookDetails(book) {
     document.getElementById('isbnNumber').value = '';
 }
 
+// Handle login
+// Function to show the login form modal
+function showLoginModal() {
+    const loginModal = document.getElementById('login-form');
+    if (loginModal) {
+        loginModal.style.display = 'block'; // Show the modal
+    }
+}
+
+// Function to hide the login form modal
+function hideLoginModal() {
+    const loginModal = document.getElementById('login-form');
+    if (loginModal) {
+        loginModal.style.display = 'none'; // Hide the modal
+    }
+}
+
+// Handling form submission and login
+document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        hideLoginModal();
+        document.getElementById('content').style.display = 'block';
+    } catch (error) {
+        switch (error.code) {
+            case 'auth/user-not-found':
+                errorMessage.textContent = 'No user found with this email.';
+                break;
+            case 'auth/wrong-password':
+                errorMessage.textContent = 'Incorrect password.';
+                break;
+            case 'auth/invalid-email':
+                errorMessage.textContent = 'Invalid email format.';
+                break;
+            default:
+                errorMessage.textContent = 'Login failed. Please try again.';
+        }
+    }
+});
+
+window.onload = function () {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('content').style.display = 'block';
+        } else {
+            showLoginModal();
+        }
+    });
+};
+
+// Handle logout
+document.getElementById('logout-button').addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+        document.getElementById('content').style.display = 'none';
+        showLoginModal();
+    } catch (error) {
+        console.error("Error logging out:", error.message);
+    }
+});
+
+// Streamlined login logic, ensuring only login and logout functionalities remain
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+    } else {
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('content').style.display = 'none';
+    }
+});
+
+// Function to log in a user
+function logIn(email, password) {
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log("User logged in:", user);
+    })
+    .catch((error) => {
+      console.error("Error logging in:", error.message);
+    });
+}
+
+// Function to log out the user
+function logOut() {
+  auth.signOut()
+    .then(() => {
+      console.log("User logged out");
+    })
+    .catch((error) => {
+      console.error("Error logging out:", error.message);
+    });
+}
 
 // Helper function to show success or error messages
 function showStatusMessage(message, type) {
@@ -578,7 +700,8 @@ function showStatusMessage(message, type) {
     // Send button click action
     document.getElementById('sendButton').addEventListener('click', function () {
         // Perform send action (e.g., sending email)
-        sendEmail(); 
+        sendEmail();
+
     });
 
 // Reset page function
