@@ -90,10 +90,14 @@
             const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
             const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
 
+
             if ((startDate && dateReceived && dateReceived < startDate) ||
                 (endDate && dateReceived && dateReceived > endDate)) {
                 return;
             }
+
+            console.log("Date Canceled:", data.dateCanceled);
+
 
             const fieldsToSearch = [
                 data.bookDetails,
