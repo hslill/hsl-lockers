@@ -290,7 +290,7 @@ async function cancelLockerRequest(lockerNumber) {
         console.log(`Locker ${lockerNumber} request canceled.`);
 
         // Call the function to update the transaction document with the cancellation date
-        await cancelTransaction(transactionNumber);
+        await cancelTransaction(transactionNumber); // Only call when canceling the request
 
         fetchLockerStatus();  // Re-fetch locker data to reflect the change
     } catch (error) {
@@ -310,7 +310,7 @@ async function cancelTransaction(transactionNumber) {
 
         // Update the transaction with the dateCanceled field as a string
         await updateDoc(transactionRef, {
-            dateCanceled: formattedDate
+            dateCanceled: formattedDate // Only set this when the cancel button is clicked
         });
         console.log('Transaction canceled and dateCanceled added as a string.');
     } catch (error) {
@@ -419,14 +419,14 @@ document.getElementById('notificationForm').addEventListener('submit', async fun
         }
 
         const transactionRef = doc(db, 'transactions', transactionNumber);
+        // Modify this section in the 'submit transaction' flow:
         const transactionData = {
             lockerNumber: lockerNumber,
             combination: combination,
             recipientName: recipientName,
             recipientEmail: recipientEmail,
             bookDetails: bookDetails,
-            dateReceived: formatDateTimeToEastern(new Date()), // Add the formatted date
-            dateCanceled: formatDateTimeToEastern(new Date())
+            dateReceived: formatDateTimeToEastern(new Date()),
         };
 
         await setDoc(transactionRef, transactionData);
