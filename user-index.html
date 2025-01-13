@@ -371,9 +371,9 @@ async function fetchTransactionData(transactionNumber) {
             // Now that we have the data, send the email
             sendPickupEmail(recipientName, bookDetails, finalTransactionNumber);
         } else {
-            // If transaction doesn't exist in Firestore, use input directly
-            sendPickupEmail("Unknown", "Details not available", transactionNumber);
+            // If transaction doesn't exist in Firestore, show alert and do not send email
             alert("Transaction not found, using input transaction number.");
+            // You can optionally log this or perform another action instead of sending the email
         }
     } catch (error) {
         console.error("Error fetching transaction data:", error);
