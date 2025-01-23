@@ -2,7 +2,7 @@
 /* Global Styles */
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #580f8b, #1e3a8a);
+  background: #580f8b;
   color: #333;
   margin: 0;
   padding: 0;
@@ -14,28 +14,20 @@ body {
   box-sizing: border-box;
 }
 
-h1 {
-  font-size: 2.5em;
-  text-align: center;
-  color: white;
-  margin-bottom: 30px;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  padding: 20px 0; /* Optional padding for spacing */
-}
-
 form {
+  margin-top: 30px;
   background: #ffffff;
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   box-sizing: border-box;
   animation: fadeIn 1s ease-out;
 }
 
 form label {
+  width: 500px;
   font-size: 1.1em;
   margin-bottom: 5px;
   color: #444;
@@ -174,6 +166,7 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
 }
 
 #emailPreviewContainer {
+  width: 560px;
   border: 1px solid #ccc;
   padding: 20px;
   margin-top: 30px;
@@ -277,6 +270,7 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
 }
 
 nav {
+  top: 0px;
   background-color: #2b2b2b; /* Industrial dark gray background */
   padding: 15px 20px;       /* Add spacing for better structure */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
@@ -472,4 +466,14 @@ export-buttons .btn{
 label .login-form {
   text-align: center;
 
+}
+
+.aside {
+  width: 275px;
+  height: 900px;
+  padding: 10px;
+  font-family: 'Roboto', sans-serif;
+  color: white;
+  background: #580f8b;
+  overflow-y: auto;
 }
