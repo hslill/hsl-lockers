@@ -43,13 +43,28 @@
       <p id="error-message" style="color: red;"></p>
     </div>
   </div>
-    
-    <h1>Book Locker Notification System</h1>
 
-    <div id="lockerStatus">
+  <div style="display: flex;">
+    <!-- Side panel for lockers -->
+    <aside class="aside">
+        <main style="flex: 1; padding: 20px;">
+            <h1>Book Locker Notification System</h1>
         <h3>Locker Status</h3>
-        <ul id="lockerList"></ul>
-    </div>
+        <ul id="lockerList" style="padding: 0; list-style: none;">
+            <!-- Example locker items -->
+            <li style="margin-bottom: 10px; padding: 10px; background-color: #e6f7ff; border: 1px solid #b3d8ff; border-radius: 5px;">
+                <strong>Locker 1:</strong> Available
+            </li>
+            <li style="margin-bottom: 10px; padding: 10px; background-color: #ffe6e6; border: 1px solid #ffb3b3; border-radius: 5px;">
+                <strong>Locker 2:</strong> In Use
+            </li>
+            <!-- Add more lockers dynamically -->
+        </ul>
+    </aside>
+
+    <!-- Main content -->
+
+        <!-- Your existing form content here -->
 
     <form id="notificationForm">
         <label for="recipientName">Recipient Name:</label>
