@@ -165,7 +165,8 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
 }
 
 #emailPreviewContainer {
-  width: 560px;
+  max-width: 50%;
+  margin-right: 5vw;
   border: 1px solid #ccc;
   padding: 20px;
   margin-top: 75px;
@@ -472,7 +473,7 @@ label .login-form {
 
 .aside {
   margin-top: 20px;
-  width: 275px;
+  min-width: 275px;
   height: 900px;
   padding: 5px;
   font-family: 'Roboto', sans-serif;
