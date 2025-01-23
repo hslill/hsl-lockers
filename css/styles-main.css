@@ -1,5 +1,4 @@
 /* Global Styles */
-/* Global Styles */
 body {
   font-family: 'Roboto', sans-serif;
   background: #580f8b;
@@ -8,14 +7,14 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column; /* Stack elements vertically */
-  align-items: center; /* Center horizontally */
+  
   justify-content: flex-start; /* Align content to the top */
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 form {
-  margin-top: 30px;
+  margin-top: 75px;
   background: #ffffff;
   padding: 30px;
   border-radius: 10px;
@@ -169,7 +168,7 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
   width: 560px;
   border: 1px solid #ccc;
   padding: 20px;
-  margin-top: 30px;
+  margin-top: 75px;
   background-color: #fafafa;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -272,6 +271,8 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
 
 nav {
   top: 0px;
+  position: fixed;
+  width: 100%;
   background-color: #2b2b2b; /* Industrial dark gray background */
   padding: 15px 20px;       /* Add spacing for better structure */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
@@ -470,12 +471,60 @@ label .login-form {
 }
 
 .aside {
+  margin-top: 20px;
   width: 275px;
   height: 900px;
-  padding: 10px;
+  padding: 5px;
   font-family: 'Roboto', sans-serif;
   color: white;
   background: #580f8b;
   overflow-y: auto;
 }
 
+/* Footer styling */
+footer {
+  font-family: "Arial", sans-serif; /* Clean, modern font */
+  background-color: #2b2b2b; /* Adjust color as needed */
+  color: white;
+  text-align: center;
+  padding: 10px 20px;
+  text-transform: uppercase; /* Adds an industrial vibe */
+  border-top: 2px solid #444; /* Adds an industrial-style bottom border */
+  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+  width: 100%; /* Full width */
+  position:fixed; /* Position it relative to the viewport */
+  bottom: 0; /* Stick it to the bottom */
+  z-index: 1000; /* Ensure it's above other elements */
+  transition: all 0.3s ease-in-out; /* Smooth transition effects */
+}
+
+
+/* Styling for <a> elements inside the footer */
+footer a {
+  color: #b85cfa;
+  text-decoration: none;
+  margin: 0 10px; /* Space between links */
+}
+
+/* Hover and active states for the <a> elements */
+footer a:hover {
+  color: #ae4cf5; /* Rusty red hover color for an industrial look */
+  text-shadow: 0px 0px 5px rgba(255, 107, 107, 0.8); /* Glow effect */
+  text-decoration: underline; /* Underline on hover */
+  transition: all 0.3s ease-in-out; /* Smooth transition effects */
+}
+
+footer a:active {
+  color: rgba(255, 107, 107, 0.8); /* Darker green when the link is clicked */
+}
+
+footer a:after {
+  content: ""; /* Empty content for a hover underline effect */
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background: #ae4cf5; /* Matches the hover color */
+  bottom: -5px;
+  left: 0;
+  transition: all 0.3s ease-in-out; /* Smooth transition effects */
+}
