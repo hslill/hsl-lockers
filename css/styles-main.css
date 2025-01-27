@@ -143,13 +143,23 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
   font-size: 1.2em;
   text-align: center;
   border-radius: 5px;
-  display: none;
+  display: none; /* Hidden by default */
   transition: opacity 0.3s ease;
+  margin-left: 20px; /* Adjust margin to fit your design */
+  color: white; /* Default text color */
 }
 
+/* Success message style */
 #statusMessage.success {
-  background-color: #d4edda;
   color: white;
+  background-color: black; /* You can change the background color as needed */
+}
+
+#statusMessage {
+  position: absolute;
+  top: 100%; /* This ensures it's placed directly below the #form */
+  left: 0;
+  right: 0;
 }
 
 #statusMessage.error {
@@ -390,7 +400,7 @@ th.sortable.desc::after {
 }
 
 #export-buttons .btn {
-  background-color: #580f8b; /* Green background for buttons to match other buttons */
+  background-color: #580f8b; /* Background for buttons to match other buttons */
   color: white; /* White text color */
   border: none; /* Remove borders */
   padding: 8px 15px; /* Padding inside the buttons */
@@ -491,7 +501,7 @@ footer {
   background-color: #2b2b2b;
   color: white;
   text-align: center;
-  padding: 10px 20px;
+  padding: 5px 20px;
   text-transform: uppercase;
   border-top: 2px solid #444;
   box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.5);
@@ -519,7 +529,7 @@ footer a:hover {
 }
 
 footer a:active {
-  color: rgba(255, 107, 107, 0.8); /* Darker green when the link is clicked */
+  color: rgba(255, 107, 107, 0.8); /* Red when the link is clicked */
 }
 
 footer a:after {
