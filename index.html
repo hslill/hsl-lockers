@@ -632,6 +632,10 @@ document.getElementById('login-form-inner').addEventListener('submit', async (e)
         await signInWithEmailAndPassword(auth, email, password);
         hideLoginModal();
         document.getElementById('content').style.display = 'block';
+
+          // Automatically reload the page after successful login
+          setTimeout(() => location.reload(), 500); // Short delay for smooth transition
+          
     } catch (error) {
         switch (error.code) {
             case 'auth/user-not-found':
