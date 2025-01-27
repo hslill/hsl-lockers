@@ -7,14 +7,15 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column; /* Stack elements vertically */
-  
   justify-content: flex-start; /* Align content to the top */
-  min-height: 100vh;
+  min-height: 100vh; /* Ensure body takes full height of the viewport */
   box-sizing: border-box;
 }
 
+
 form {
-  margin-top: 75px;
+  margin-top: 50px;
+  margin-bottom: 100px;
   background: #ffffff;
   padding: 30px;
   border-radius: 10px;
@@ -169,7 +170,8 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
   margin-right: 5vw;
   border: 1px solid #ccc;
   padding: 20px;
-  margin-top: 75px;
+  margin-top: 50px;
+  margin-bottom: 100px;
   background-color: #fafafa;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -482,23 +484,24 @@ label .login-form {
   overflow-y: auto;
 }
 
-/* Footer styling */
+
+/* Footer Styling */
 footer {
-  font-family: "Arial", sans-serif; /* Clean, modern font */
-  background-color: #2b2b2b; /* Adjust color as needed */
+  font-family: "Arial", sans-serif;
+  background-color: #2b2b2b;
   color: white;
   text-align: center;
   padding: 10px 20px;
-  text-transform: uppercase; /* Adds an industrial vibe */
-  border-top: 2px solid #444; /* Adds an industrial-style bottom border */
-  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+  text-transform: uppercase;
+  border-top: 2px solid #444;
+  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.5);
   width: 100%; /* Full width */
-  position:fixed; /* Position it relative to the viewport */
-  bottom: 0; /* Stick it to the bottom */
-  z-index: 1000; /* Ensure it's above other elements */
-  transition: all 0.3s ease-in-out; /* Smooth transition effects */
+  z-index: 1000;
+  position: fixed; /* Fixes the footer to the bottom */
+  bottom: 0; /* Sticks to the bottom of the viewport */
+  left: 0; /* Ensures it covers the entire width */
+  transition: all 0.3s ease-in-out;
 }
-
 
 /* Styling for <a> elements inside the footer */
 footer a {
