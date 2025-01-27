@@ -474,33 +474,33 @@ function extractISBN(bookDetails) {
     return match ? match[0] : null;
 }
 
-
- // Handle locker assignment only on assignLockerButton click
 document.getElementById('assignLockerButton').addEventListener('click', async () => {
     const lockerRef = collection(db, "lockers");
     try {
         // Fetch all locker data
         const querySnapshot = await getDocs(lockerRef);
-        let availableLocker = null;
+        const availableLockers = [];
 
         // Iterate over each locker to check for availability
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             if (data.status === "" || data.status === 'available') {
-                availableLocker = data.lockerNumber;
-                return; // Break the loop once an available locker is found
+                availableLockers.push(data.lockerNumber);
             }
         });
 
-        if (availableLocker) {
-            // If an available locker is found, assign it to the hidden locker number field
-            document.getElementById('lockerNumberField').value = availableLocker;
-            window.lockerNumber = availableLocker;  // Update the global locker number
-            alert(`Locker ${availableLocker} has been assigned.`);
-            
+        if (availableLockers.length > 0) {
+            // Randomly select a locker from the available lockers
+            const randomIndex = Math.floor(Math.random() * availableLockers.length);
+            const randomLocker = availableLockers[randomIndex];
+
+            // Assign the randomly selected locker to the hidden locker number field
+            document.getElementById('lockerNumberField').value = randomLocker;
+            window.lockerNumber = randomLocker;  // Update the global locker number
+            alert(`Locker ${randomLocker} has been assigned.`);
+
             // Call the function to update the email preview with the new locker number
             generateLockerAndCombination();  // This will ensure email preview reflects the correct locker number
-
         } else {
             // If no available lockers, show an alert
             alert('No available lockers at the moment.');
