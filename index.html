@@ -47,6 +47,10 @@
   <div style="display: flex;">
     <!-- Side panel for lockers -->
     <aside class="aside">
+            <!-- NYU logo using a div with background-image -->
+    <div id="nyulogo" class="nyulogo">
+    <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
+</div>
         <main style="flex: 1; padding: 20px;">
             <h1>Book Locker Notification System</h1>
         <h3>Locker Status</h3>
@@ -116,6 +120,10 @@
             </div>
         </div> 
         <div id="lockerDetails"></div>
+
+        <footer>
+            <p>Data source: <a href="https://console.firebase.google.com/project/book-pickup-kiosk01/firestore/databases/-default-/data/~2Flockers~2Flocker_32" target="_blank">Firebase</a> | Email Manager: <a href="https://dashboard.emailjs.com/admin/templates/f1au81t/content" target="_blank">EmailJS</a> | Webhost: <a href="https://github.com/hslill/lohlockers" target="_blank">GitHub</a></p>
+        </footer>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
@@ -474,7 +482,9 @@ function extractISBN(bookDetails) {
     return match ? match[0] : null;
 }
 
-document.getElementById('assignLockerButton').addEventListener('click', async () => {
+
+ // Handle locker assignment only on assignLockerButton click
+ document.getElementById('assignLockerButton').addEventListener('click', async () => {
     const lockerRef = collection(db, "lockers");
     try {
         // Fetch all locker data
@@ -734,9 +744,5 @@ document.getElementById('resetButton').addEventListener('click', function () {
         <script src="js/barcodeUtils.js"></script>
 
 </body>
-
-<footer>
-    <p>Data source: <a href="https://console.firebase.google.com/project/book-pickup-kiosk01/firestore/databases/-default-/data/~2Flockers~2Flocker_32" target="_blank">Firebase</a> | Email Manager: <a href="https://dashboard.emailjs.com/admin/templates/f1au81t/content" target="_blank">EmailJS</a> | Webhost: <a href="https://github.com/hslill/lohlockers" target="_blank">GitHub</a></p>
-</footer>
 
 </html>
