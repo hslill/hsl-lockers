@@ -110,3 +110,17 @@ body {
 #closeAndClearButton:hover {
     background-color: #ae4cf5 !important; /* Hover effect */
 }
+
+.nyulogo {
+    position: fixed;
+    justify-content: center;
+    top: 400px;
+    width: 200px;
+    height: 50px;  /* Set a height value */
+    z-index: 1000;
+  }
+  
+  .nyulogo img {
+    width: 200px;
+    height: auto;
+  }
