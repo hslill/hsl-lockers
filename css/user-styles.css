@@ -114,7 +114,7 @@ body {
 .nyulogo {
     position: fixed;
     justify-content: center;
-    top: 300px;
+    top: 30vh;
     width: 200px;
     height: 50px;  /* Set a height value */
     z-index: 1000;
