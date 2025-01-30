@@ -169,9 +169,8 @@ async function fetchLockerStatus() {
 
             const listItem = document.createElement('li');
             listItem.innerHTML = `
-                <span style="font-weight: bold;">Locker ${lockerNumber}:</span>
+                <span style="font-weight: bold;">${lockerNumber}:</span>
                 <span class="status-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ${status === 'available' ? 'green' : 'red'}; margin-left: 10px;"></span>
-                <span style="margin-left: 5px;">${status}</span>
             `;
 
             // Show the popup on hover (only for non-available lockers)
@@ -186,34 +185,34 @@ async function fetchLockerStatus() {
                 hidePopup();
             });
 
-// Add cancel button for lockers that are in-use
-if (status === 'in-use') {
-    const cancelButton = document.createElement('span');
-    cancelButton.textContent = 'cancel';
-    cancelButton.style.color = 'red';
-    cancelButton.style.cursor = 'pointer';
-    cancelButton.style.marginLeft = '10px';
+            // Add cancel button for lockers that are in-use
+            if (status === 'in-use') {
+                const cancelButton = document.createElement('span');
+                cancelButton.innerHTML = '&#10060;'; // Unicode for ❌
+                cancelButton.style.color = 'red';
+                cancelButton.style.cursor = 'pointer';
+                cancelButton.style.marginLeft = '10px';
+                cancelButton.style.fontSize = '16px'; // Make it slightly larger for visibility
 
-    cancelButton.addEventListener('click', async (e) => {
-        e.stopPropagation(); // Prevent the click from triggering the locker contents popup
-        
-        // Show confirmation dialog
-        const isConfirmed = window.confirm('Are you sure you want to cancel?');
+                cancelButton.addEventListener('click', async (e) => {
+                    e.stopPropagation(); // Prevent the click from triggering the locker contents popup
 
-        if (isConfirmed) {
-            // If confirmed, cancel the locker request
-            await cancelLockerRequest(lockerNumber);  
+                    // Show confirmation dialog
+                    const isConfirmed = window.confirm('Are you sure you want to cancel?');
+
+                    if (isConfirmed) {
+                        // If confirmed, cancel the locker request
+                        await cancelLockerRequest(lockerNumber);  
 
                         // Refresh the page after canceling
-            window.location.reload();
-        }
-    });
-    
-    listItem.appendChild(cancelButton);
-}
+                        window.location.reload();
+                    }
+                });
 
-lockerList.appendChild(listItem);
+                listItem.appendChild(cancelButton);
+            }
 
+            lockerList.appendChild(listItem);
         });
 
     } catch (error) {
