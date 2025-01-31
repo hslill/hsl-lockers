@@ -556,3 +556,14 @@ footer a:after {
   left: 0;
   transition: all 0.3s ease-in-out; /* Smooth transition effects */
 }
+
+.locker-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.locker-table td {
+  padding: 10px;
+  text-align: left;
+}
+
