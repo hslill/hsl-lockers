@@ -497,18 +497,28 @@ function extractISBN(bookDetails) {
 }
 
 
- // Handle locker assignment only on assignLockerButton click
- document.getElementById('assignLockerButton').addEventListener('click', async () => {
+// Handle locker assignment only on assignLockerButton click
+document.getElementById('assignLockerButton').addEventListener('click', async () => {
     const lockerRef = collection(db, "lockers");
     try {
         // Fetch all locker data
         const querySnapshot = await getDocs(lockerRef);
-        const availableLockers = [];
+        let availableLockers = [];
 
-        // Iterate over each locker to check for availability
+        // Define allowed ranges based on the current page
+        let allowedLockers = [];
+        if (window.location.pathname.includes('index-lapidus.html')) {
+            allowedLockers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+        } else if (window.location.pathname.includes('index-hollis.html')) {
+            allowedLockers = [40, 41, 42, 43, 44, 45, 46, 47, 48];
+        } else {
+            allowedLockers = [32, 33, 34, 35, 36, 37, 38, 39]; // Default to index.html
+        }
+
+        // Iterate over each locker to check for availability and match allowed lockers
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            if (data.status === "" || data.status === 'available') {
+            if ((data.status === "" || data.status === 'available') && allowedLockers.includes(data.lockerNumber)) {
                 availableLockers.push(data.lockerNumber);
             }
         });
