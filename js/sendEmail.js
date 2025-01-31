@@ -62,7 +62,7 @@ function sendEmail() {
                         console.log("Data being sent to EmailJS:", emailData);
 
                         // Send the email using EmailJS
-                        emailjs.send("desimd01", "book_pickup", emailData)
+                        emailjs.send("pickup", "book_pickup", emailData)
                             .then((response) => {
                                 console.log('Email sent successfully!', response);
                                 alert('Email sent successfully!');
@@ -96,7 +96,7 @@ function sendEmail() {
             };
 
             // Send the email using EmailJS
-            emailjs.send("desimd01", "book_pickup", emailData)
+            emailjs.send("pickup", "book_pickup", emailData)
                 .then((response) => {
                     console.log('Email sent successfully!', response);
                     alert('Email sent successfully!');
