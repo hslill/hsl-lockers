@@ -3,10 +3,10 @@ function generateCombination() {
     return Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number between 1000 and 9999
 }
 
-// Function to assign a locker number between 32 and 36
+// Function to assign a locker number between 32 and 39
 function assignLockerNumber() {
     const minLocker = 32;
-    const maxLocker = 36;
+    const maxLocker = 39;
     return Math.floor(Math.random() * (maxLocker - minLocker + 1)) + minLocker;
 }
 
