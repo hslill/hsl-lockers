@@ -149,7 +149,7 @@
 let isLockerStatusFetched = false;
 
 async function fetchLockerStatus() {
-    if (isLockerStatusFetched) return; // Guard to prevent fetching again
+    if (isLockerStatusFetched) return; // Prevent multiple fetches
     isLockerStatusFetched = true;
 
     const lockerList = document.getElementById('lockerList');
@@ -160,12 +160,32 @@ async function fetchLockerStatus() {
 
     lockerList.innerHTML = ''; // Clear the list before adding new data
 
+    // Determine the current library based on the URL or a data attribute
+    let currentLibrary = '';
+    if (window.location.pathname.includes('index-hollis.html')) {
+        currentLibrary = 'hollis';
+    } else if (window.location.pathname.includes('index-lapidus.html')) {
+        currentLibrary = 'lapidus';
+    } else {
+        currentLibrary = 'robbins'; // Default to Robbins Library
+    }
+
+    // Define lockers per library
+    const libraryLockers = {
+        robbins: [32, 33, 34, 35, 36, 37, 38, 39], // Already in place
+        lapidus: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+        hollis: [40, 41, 42, 43, 44, 45, 46, 47, 48]
+    };
+
     try {
         const querySnapshot = await getDocs(collection(db, "lockers"));
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            const status = data.status || 'available'; // Default to 'available' if no status is found
+            const status = data.status || 'available'; // Default to 'available'
             const lockerNumber = data.lockerNumber;
+
+            // Show only lockers for the current library
+            if (!libraryLockers[currentLibrary].includes(lockerNumber)) return;
 
             const listItem = document.createElement('li');
             listItem.innerHTML = `
@@ -176,7 +196,7 @@ async function fetchLockerStatus() {
             // Show the popup on hover (only for non-available lockers)
             listItem.addEventListener('mouseover', (event) => {
                 if (status !== 'available') {
-                    showPopup(event, data);  // Pass locker data to the popup function
+                    showPopup(event, data);  
                 }
             });
 
@@ -185,26 +205,21 @@ async function fetchLockerStatus() {
                 hidePopup();
             });
 
-            // Add cancel button for lockers that are in-use
+            // Add cancel button for lockers that are in use
             if (status === 'in-use') {
                 const cancelButton = document.createElement('span');
                 cancelButton.innerHTML = '&#10060;'; // Unicode for ❌
                 cancelButton.style.color = 'red';
                 cancelButton.style.cursor = 'pointer';
                 cancelButton.style.marginLeft = '10px';
-                cancelButton.style.fontSize = '16px'; // Make it slightly larger for visibility
+                cancelButton.style.fontSize = '16px'; 
 
                 cancelButton.addEventListener('click', async (e) => {
-                    e.stopPropagation(); // Prevent the click from triggering the locker contents popup
+                    e.stopPropagation(); // Prevent the click from triggering the popup
 
-                    // Show confirmation dialog
                     const isConfirmed = window.confirm('Are you sure you want to cancel?');
-
                     if (isConfirmed) {
-                        // If confirmed, cancel the locker request
                         await cancelLockerRequest(lockerNumber);  
-
-                        // Refresh the page after canceling
                         window.location.reload();
                     }
                 });
