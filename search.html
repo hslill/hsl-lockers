@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="css/styles-main.css">
     <!-- Add Tablesort library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+
+
         <div class="logoutButton">
           <!-- Content for logged-in users -->
           <div id="content">
@@ -111,26 +116,7 @@
             }
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-
-// The cancelRequest function to update the transaction as canceled
-function cancelRequest(event) {
-    const transactionId = event.target.getAttribute("data-doc-id");
-
-    // Mark the transaction as canceled
-    const transactionRef = doc(db, "transactions", transactionId);
-    updateDoc(transactionRef, {
-        dateCanceled: new Date().toISOString()
-    }).then(() => {
-        console.log("Transaction canceled:", transactionId);
-        searchTransactions(""); // Refresh the results after canceling
-    }).catch((error) => {
-        console.error("Error canceling transaction:", error);
-    });
-}
-
-// Function to search transactions
-async function searchTransactions(queryText) {
+        async function searchTransactions(queryText) {
     try {
         console.log("Searching for:", queryText);
 
@@ -279,6 +265,34 @@ async function searchTransactions(queryText) {
     }
 }
 
+// The cancelRequest function to update the transaction as canceled
+function cancelRequest(event) {
+    const transactionId = event.target.getAttribute("data-doc-id");
+
+    // Get the current time formatted in EDT
+    const now = moment().tz("America/New_York");  // Get current time in EDT
+    const formattedDate = now.format("YYYY-MM-DDTHH:mm:ssA-") + now.format("z");  // Format as '2025-01-29T09:51:16PM-EST'
+
+    // Mark the transaction as canceled with the formatted date
+    const transactionRef = doc(db, "transactions", transactionId);
+    updateDoc(transactionRef, {
+        dateCanceled: formattedDate // Use the formatted date for cancellation
+    }).then(() => {
+        console.log("Transaction canceled:", transactionId);
+        searchTransactions(""); // Refresh the results after canceling
+    }).catch((error) => {
+        console.error("Error canceling transaction:", error);
+    });
+}
+
+// Event listener for DOMContentLoaded
+document.addEventListener("DOMContentLoaded", function () {
+    // Moment.js for current date/time
+    const now = moment().tz("America/New_York");  // Get current time in EDT
+    const formattedDate = now.format("YYYY-MM-DDTHH:mm:ssA-") + now.format("z");  // Format as '2025-01-29T09:51:16PM-EST'
+    console.log("Current Date/Time (EDT):", formattedDate);
+});
+
 document.getElementById("search-button").addEventListener("click", () => {
     const searchText = document.getElementById("search-input").value;
     searchTransactions(searchText);
@@ -298,16 +312,16 @@ document.getElementById("show-canceled").addEventListener("click", () => {
         searchTransactions(searchText);
     }
 });
-});
 
 // Reset search form functionality
 document.getElementById("resetSearchButton").addEventListener("click", function () {
-document.getElementById("search-input").value = "";
-document.getElementById("start-date").value = "";
-document.getElementById("end-date").value = "";
-document.getElementById("include-canceled").checked = false;
-searchTransactions(""); // Clear search results
+    document.getElementById("search-input").value = "";
+    document.getElementById("start-date").value = "";
+    document.getElementById("end-date").value = "";
+    document.getElementById("include-canceled").checked = false;
+    searchTransactions(""); // Clear search results
 });
+
 
         // Add keyboard accessibility
         document.getElementById("search-button").addEventListener("keydown", (event) => {
