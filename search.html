@@ -13,11 +13,78 @@
             <button id="logout-button">Logout</button>
           </div>
         </div>
-    
+    </head>
+        <body id="search-page">
+            <header>
+                <h1>Search Transactions</h1>
+            </header>
+            <main>
+                <section id="search-section">
+                    <input type="text" id="search-input" placeholder="Press ENTER for all, or enter details to filter" />
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" />
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" />
+                    <button id="search-button">Search</button>
+        
+                    <!-- Filter checkbox for canceled requests -->
+                    <label>
+                        <input type="checkbox" id="show-canceled"> Show only canceled requests
+
+                    </label>
+                </section>
+                
+                <section id="results-section">
+                    <table id="results-table" class="display">
+                        <thead>
+                            <tr>
+                                <th>Locker #</th>
+                                <th>Transaction Number</th>
+                                <th>Date Received</th>
+                                <th>Date Picked Up</th>
+                                <th>Date Canceled</th>
+                                <th>Book Details</th>
+                                <th>Recipient Email</th>
+                                <th>Recipient</th>
+                                <th>Locker Status</th>
+                                <th>Actions</th> <!-- Added column for cancel buttons -->
+                            </tr>
+                        </thead>               
+                        <tbody>
+                            <!-- Results will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+        
+                    <!-- Row for displaying results count -->
+                    <div id="results-count">
+                        <p>Total Results Found: <span id="total-results">0</span></p>
+                    </div>
+                </section>
+        
+                <!-- Buttons for exporting CSV, PDF, and Print -->
+                <div id="export-buttons">
+                    <button id="export-csv" class="btn">
+                        <i class="fas fa-file-csv"></i> Export
+                    </button>
+                    <button id="export-pdf" class="btn">
+                        <i class="fas fa-file-pdf"></i> Download
+                    </button>
+                    <button id="print-results" class="btn">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+        
+                <!-- Button for resetting search -->
+                <div id="buttonContainer">
+                    <input type="button" id="resetSearchButton" name="Reset" value="Reset">
+                    <a href="#" id="homeLink">Home</a>
+                </div>
+            </main>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js"; // Import Firebase Auth
 
         const firebaseConfig = {
@@ -44,7 +111,26 @@
             }
         });
 
-        async function searchTransactions(queryText) {
+        document.addEventListener("DOMContentLoaded", function () {
+
+// The cancelRequest function to update the transaction as canceled
+function cancelRequest(event) {
+    const transactionId = event.target.getAttribute("data-doc-id");
+
+    // Mark the transaction as canceled
+    const transactionRef = doc(db, "transactions", transactionId);
+    updateDoc(transactionRef, {
+        dateCanceled: new Date().toISOString()
+    }).then(() => {
+        console.log("Transaction canceled:", transactionId);
+        searchTransactions(""); // Refresh the results after canceling
+    }).catch((error) => {
+        console.error("Error canceling transaction:", error);
+    });
+}
+
+// Function to search transactions
+async function searchTransactions(queryText) {
     try {
         console.log("Searching for:", queryText);
 
@@ -54,6 +140,7 @@
 
         const startDate = document.getElementById("start-date").value;
         const endDate = document.getElementById("end-date").value;
+        const includeCanceled = document.getElementById("show-canceled").checked; // Get the checkbox value
 
         function formatDate(rawDate) {
             const [date, timeWithTimezone] = rawDate.split('T');
@@ -90,15 +177,12 @@
             const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
             const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
 
-
             if ((startDate && dateReceived && dateReceived < startDate) ||
                 (endDate && dateReceived && dateReceived > endDate)) {
                 return;
             }
 
-            console.log("Date Canceled:", data.dateCanceled);
-
-
+            // General search - include everything (including canceled)
             const fieldsToSearch = [
                 data.bookDetails,
                 data.recipientEmail,
@@ -108,26 +192,51 @@
 
             const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
 
-            if (matchesQuery) {
-                resultsFound++; // Increment the results counter
-                const row = resultsTable.insertRow();
+            // When "Show Canceled" is NOT checked, we include everything (canceled or not)
+            if (!includeCanceled) {
+                if (matchesQuery) {
+                    resultsFound++; // Increment the results counter
+                    const row = resultsTable.insertRow();
 
-                // Fixing the lockerNumber lookup issue by adding the "locker_" prefix
-                const lockerStatusKey = `locker_${data.lockerNumber}`;  // Add "locker_" prefix
-                const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown"; // Lookup with the correct key
+                    // Fixing the lockerNumber lookup issue by adding the "locker_" prefix
+                    const lockerStatusKey = `locker_${data.lockerNumber}`;  // Add "locker_" prefix
+                    const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown"; // Lookup with the correct key
 
-                row.innerHTML = ` 
-                    <td>${data.lockerNumber}</td>
-                    <td>${doc.id}</td>
-                    <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
-                    <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
-                    <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td> <!-- Add Date Canceled here -->
-                    <td>${data.bookDetails || "N/A"}</td>
-                    <td>${data.recipientEmail || "N/A"}</td>
-                    <td>${data.recipientName || "N/A"}</td>
-                    <td>${lockerStatus}</td>
-                `;
-                console.log("Transaction found:", data);
+                    row.innerHTML = ` 
+                        <td>${data.lockerNumber}</td>
+                        <td>${doc.id}</td>
+                        <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                        <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                        <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td> <!-- Add Date Canceled here -->
+                        <td>${data.bookDetails || "N/A"}</td>
+                        <td>${data.recipientEmail || "N/A"}</td>
+                        <td>${data.recipientName || "N/A"}</td>
+                        <td>${lockerStatus}</td>
+                        <td>${dateCanceled ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`}</td> <!-- Added Cancel Button -->
+                    `;
+                }
+            } else {
+                // When "Show Canceled" IS checked, only show canceled transactions
+                if (matchesQuery && dateCanceled) {
+                    resultsFound++; // Increment the results counter
+                    const row = resultsTable.insertRow();
+
+                    const lockerStatusKey = `locker_${data.lockerNumber}`;
+                    const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown";
+
+                    row.innerHTML = ` 
+                        <td>${data.lockerNumber}</td>
+                        <td>${doc.id}</td>
+                        <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                        <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                        <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td>
+                        <td>${data.bookDetails || "N/A"}</td>
+                        <td>${data.recipientEmail || "N/A"}</td>
+                        <td>${data.recipientName || "N/A"}</td>
+                        <td>${lockerStatus}</td>
+                        <td>${dateCanceled ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`}</td>
+                    `;
+                }
             }
         });
 
@@ -152,35 +261,53 @@
         });
 
         table.addEventListener("beforeSort", function (e) {
-            // Log e.detail for debugging
             console.log(e.detail);
+            const th = e.target;
+            const isAsc = e.detail.direction === "asc";
+            headers.forEach(header => header.classList.remove("asc", "desc"));
+            th.classList.add(isAsc ? "asc" : "desc");
+        });
 
-            if (e.detail && e.detail.direction) {
-                const th = e.target;
-                const isAsc = e.detail.direction === "asc";
-
-                // Remove previous indicator classes
-                headers.forEach(header => header.classList.remove("asc", "desc"));
-
-                // Add the new sorting direction class to the clicked column
-                th.classList.add(isAsc ? "asc" : "desc");
-            } 
+        // Add event listener to cancel buttons
+        const cancelBtns = document.querySelectorAll(".cancel-btn");
+        cancelBtns.forEach(button => {
+            button.addEventListener("click", cancelRequest); // Assigning cancelRequest function here
         });
 
     } catch (error) {
-        console.error("Error searching transactions:", error);
-        alert("An error occurred while searching. Please check the console for more details.");
+        console.error("Error fetching transactions:", error);
     }
 }
 
-        document.getElementById("search-button").addEventListener("click", () => {
-            const queryText = document.getElementById("search-input").value.trim();
-            if (queryText) {
-                searchTransactions(queryText);
-            } else {
-                alert("Please enter a search term.");
-            }
-        });
+document.getElementById("search-button").addEventListener("click", () => {
+    const searchText = document.getElementById("search-input").value;
+    searchTransactions(searchText);
+});
+
+let initialSearchPerformed = false;
+
+// Listen for the initial search
+document.getElementById("search-button").addEventListener("click", () => {
+    initialSearchPerformed = true; // Set flag when initial search is performed
+});
+
+// Listen for checkbox changes to trigger search
+document.getElementById("show-canceled").addEventListener("click", () => {
+    if (initialSearchPerformed) {
+        const searchText = document.getElementById("search-input").value;
+        searchTransactions(searchText);
+    }
+});
+});
+
+// Reset search form functionality
+document.getElementById("resetSearchButton").addEventListener("click", function () {
+document.getElementById("search-input").value = "";
+document.getElementById("start-date").value = "";
+document.getElementById("end-date").value = "";
+document.getElementById("include-canceled").checked = false;
+searchTransactions(""); // Clear search results
+});
 
         // Add keyboard accessibility
         document.getElementById("search-button").addEventListener("keydown", (event) => {
@@ -327,64 +454,6 @@ document.getElementById('logout-button').addEventListener('click', async () => {
 });
 
     </script>
-    
-</head>
-<body id="search-page">
-    <header>
-        <h1>Search Transactions</h1>
-    </header>
-    <main>
-        <section id="search-section">
-            <input type="text" id="search-input" placeholder="Enter transaction details..." />
-            <label for="start-date">Start Date:</label>
-            <input type="date" id="start-date" />
-            <label for="end-date">End Date:</label>
-            <input type="date" id="end-date" />
-            <button id="search-button">Search</button>
-        </section>
-        
-        <section id="results-section">
-            <table id="results-table" class="display">
-                <thead>
-                    <tr>
-                        <th>Locker #</th>
-                        <th>Transaction Number</th>
-                        <th>Date Received</th>
-                        <th>Date Picked Up</th>
-                        <th>Date Canceled</th>
-                        <th>Book Details</th>
-                        <th>Recipient Email</th>
-                        <th>Recipient</th>
-                        <th>Locker Status</th>
-                    </tr>
-                </thead>               
-                <tbody>
-                    <!-- Results will be dynamically inserted here -->
-                </tbody>
-            </table>
-
-            <!-- Add a row to display results count -->
-            <div id="results-count">
-                <p>Total Results Found: <span id="total-results">0</span></p>
-            </div>
-        </section>
-                        <!-- Add buttons for CSV, PDF, and Print -->
-    <div id="export-buttons">
-        <button id="export-csv" class="btn">
-            <i class="fas fa-file-csv"></i> Export
-        </button>
-        <button id="export-pdf" class="btn">
-            <i class="fas fa-file-pdf"></i> Download
-        </button>
-        <button id="print-results" class="btn">
-            <i class="fas fa-print"></i> Print
-        </button>
-    </div>
-        <div id="buttonContainer">
-            <input type="button" id="resetSearchButton" name="Reset" value="Reset">
-            <a href="#" id="homeLink">Home</a>
-        </div>
-    </main>
 
     <!-- Add Tablesort JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js"></script>
