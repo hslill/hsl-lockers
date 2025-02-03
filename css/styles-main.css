@@ -343,6 +343,12 @@ nav ul li:hover::after {
   color:#580f8b
 }
 
+#search-input {
+  width: 350px;
+  border: 2px 2px lightgray;
+  border-radius: 5px;
+}
+
 /* Style for the table header */
 thead {
   background-color: lightgray; /* Light gray background */
@@ -566,4 +572,3 @@ footer a:after {
   padding: 10px;
   text-align: left;
 }
-
