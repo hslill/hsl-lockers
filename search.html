@@ -158,73 +158,75 @@
         let resultsFound = 0; // Track the number of results found
 
         transactionsSnapshot.forEach((doc) => {
-            const data = doc.data();
-            const dateReceived = (typeof data.dateReceived === 'string') ? data.dateReceived.split('T')[0] : null;
-            const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
-            const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
+    const data = doc.data();
+    const dateReceived = (typeof data.dateReceived === 'string') ? data.dateReceived.split('T')[0] : null;
+    const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
+    const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
 
-            if ((startDate && dateReceived && dateReceived < startDate) ||
-                (endDate && dateReceived && dateReceived > endDate)) {
-                return;
-            }
+    if ((startDate && dateReceived && dateReceived < startDate) ||
+        (endDate && dateReceived && dateReceived > endDate)) {
+        return;
+    }
 
-            // General search - include everything (including canceled)
-            const fieldsToSearch = [
-                data.bookDetails,
-                data.recipientEmail,
-                data.recipientName,
-                doc.id
-            ];
+    const fieldsToSearch = [
+        data.bookDetails,
+        data.recipientEmail,
+        data.recipientName,
+        doc.id
+    ];
 
-            const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+    const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
 
-            // When "Show Canceled" is NOT checked, we include everything (canceled or not)
-            if (!includeCanceled) {
-                if (matchesQuery) {
-                    resultsFound++; // Increment the results counter
-                    const row = resultsTable.insertRow();
+    if (!includeCanceled) {
+        if (matchesQuery) {
+            resultsFound++;
+            const row = resultsTable.insertRow();
 
-                    // Fixing the lockerNumber lookup issue by adding the "locker_" prefix
-                    const lockerStatusKey = `locker_${data.lockerNumber}`;  // Add "locker_" prefix
-                    const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown"; // Lookup with the correct key
+            const lockerStatusKey = `locker_${data.lockerNumber}`;
+            const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown";
 
-                    row.innerHTML = ` 
-                        <td>${data.lockerNumber}</td>
-                        <td>${doc.id}</td>
-                        <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
-                        <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
-                        <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td> <!-- Add Date Canceled here -->
-                        <td>${data.bookDetails || "N/A"}</td>
-                        <td>${data.recipientEmail || "N/A"}</td>
-                        <td>${data.recipientName || "N/A"}</td>
-                        <td>${lockerStatus}</td>
-                        <td>${dateCanceled ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`}</td> <!-- Added Cancel Button -->
-                    `;
-                }
-            } else {
-                // When "Show Canceled" IS checked, only show canceled transactions
-                if (matchesQuery && dateCanceled) {
-                    resultsFound++; // Increment the results counter
-                    const row = resultsTable.insertRow();
+            // Check if Date Picked Up or Date Canceled is populated and hide cancel button accordingly
+            const cancelButton = (datePickedup || dateCanceled) ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`;
 
-                    const lockerStatusKey = `locker_${data.lockerNumber}`;
-                    const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown";
+            row.innerHTML = `
+                <td>${data.lockerNumber}</td>
+                <td>${doc.id}</td>
+                <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td>
+                <td>${data.bookDetails || "N/A"}</td>
+                <td>${data.recipientEmail || "N/A"}</td>
+                <td>${data.recipientName || "N/A"}</td>
+                <td>${lockerStatus}</td>
+                <td>${cancelButton}</td>
+            `;
+        }
+    } else {
+        if (matchesQuery && dateCanceled) {
+            resultsFound++;
+            const row = resultsTable.insertRow();
 
-                    row.innerHTML = ` 
-                        <td>${data.lockerNumber}</td>
-                        <td>${doc.id}</td>
-                        <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
-                        <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
-                        <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td>
-                        <td>${data.bookDetails || "N/A"}</td>
-                        <td>${data.recipientEmail || "N/A"}</td>
-                        <td>${data.recipientName || "N/A"}</td>
-                        <td>${lockerStatus}</td>
-                        <td>${dateCanceled ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`}</td>
-                    `;
-                }
-            }
-        });
+            const lockerStatusKey = `locker_${data.lockerNumber}`;
+            const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown";
+
+            // Check if Date Picked Up or Date Canceled is populated and hide cancel button accordingly
+            const cancelButton = (datePickedup || dateCanceled) ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`;
+
+            row.innerHTML = `
+                <td>${data.lockerNumber}</td>
+                <td>${doc.id}</td>
+                <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td>
+                <td>${data.bookDetails || "N/A"}</td>
+                <td>${data.recipientEmail || "N/A"}</td>
+                <td>${data.recipientName || "N/A"}</td>
+                <td>${lockerStatus}</td>
+                <td>${cancelButton}</td>
+            `;
+        }
+    }
+});
 
         // If no results were found in collections
         if (resultsFound === 0) {
@@ -271,7 +273,7 @@ function cancelRequest(event) {
 
     // Get the current time formatted in EDT
     const now = moment().tz("America/New_York");  // Get current time in EDT
-    const formattedDate = now.format("YYYY-MM-DDTHH:mm:ssA-") + now.format("z");  // Format as '2025-01-29T09:51:16PM-EST'
+    const formattedDate = now.format("YYYY-MM-DDThh:mm:ssA-") + now.format("z");  // Format as '2025-01-29T09:51:16PM-EST'
 
     // Mark the transaction as canceled with the formatted date
     const transactionRef = doc(db, "transactions", transactionId);
@@ -287,10 +289,7 @@ function cancelRequest(event) {
 
 // Event listener for DOMContentLoaded
 document.addEventListener("DOMContentLoaded", function () {
-    // Moment.js for current date/time
-    const now = moment().tz("America/New_York");  // Get current time in EDT
-    const formattedDate = now.format("YYYY-MM-DDTHH:mm:ssA-") + now.format("z");  // Format as '2025-01-29T09:51:16PM-EST'
-    console.log("Current Date/Time (EDT):", formattedDate);
+    console.log("Search page loaded.");
 });
 
 document.getElementById("search-button").addEventListener("click", () => {
