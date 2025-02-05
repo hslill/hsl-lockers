@@ -110,15 +110,20 @@
         <div id="emailPreview" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;"></div>
     </div>
 
-        <!-- Popup container for showing locker details -->
-        <div id="popup" class="popup">
-            <div class="popup-content">
-                <p><strong>Recipient Name:</strong> <span id="popupRecipientName"></span></p>
-                <p><strong>Email:</strong> <span id="popupRecipientEmail"></span></p>
-                <p><strong>Book Details:</strong> <span id="popupBookDetails"></span></p>
-                <p><strong>Transaction Number:</strong> <span id="popupTransactionNumber"></span></p>
-            </div>
-        </div> 
+<!-- Popup container for showing locker details -->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <p><strong>Recipient Name:</strong> <span id="popupRecipientName"></span></p>
+        <p><strong>Email:</strong> <span id="popupRecipientEmail"></span></p>
+        <p><strong>Book Details:</strong> 
+            <!-- Change this to a textarea for editing -->
+            <textarea id="popupBookDetailsInput"></textarea>
+        </p>
+        <p><strong>Transaction Number:</strong> <span id="popupTransactionNumber"></span></p>
+        <button id="saveButton">Save</button> <!-- Add a save button -->
+    </div>
+</div>
+
         <div id="lockerDetails"></div>
 
         <footer>
@@ -128,7 +133,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -148,6 +153,7 @@
 // Function to show the popup with locker details
 let isLockerStatusFetched = false;
 
+// Function to fetch locker status
 async function fetchLockerStatus() {
     if (isLockerStatusFetched) return; // Prevent multiple fetches
     isLockerStatusFetched = true;
@@ -172,7 +178,7 @@ async function fetchLockerStatus() {
 
     // Define lockers per library
     const libraryLockers = {
-        robbins: [32, 33, 34, 35, 36, 37, 38, 39], // Already in place
+        robbins: [32, 33, 34, 35, 36, 37, 38, 39],
         lapidus: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
         hollis: [40, 41, 42, 43, 44, 45, 46, 47, 48]
     };
@@ -180,29 +186,31 @@ async function fetchLockerStatus() {
     try {
         const querySnapshot = await getDocs(collection(db, "lockers"));
         querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const status = data.status || 'available'; // Default to 'available'
-            const lockerNumber = data.lockerNumber;
+    const data = doc.data();
+    data.id = doc.id;  // Ensure document ID is attached
+    console.log(`Fetched Locker ID: ${data.id}`); // Debugging log
 
-            // Show only lockers for the current library
-            if (!libraryLockers[currentLibrary].includes(lockerNumber)) return;
+    const status = data.status || 'available'; 
+    const lockerNumber = data.lockerNumber;
 
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                <span style="font-weight: bold;">${lockerNumber}:</span>
-                <span class="status-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ${status === 'available' ? 'green' : 'red'}; margin-left: 10px;"></span>
-            `;
+    if (!libraryLockers[currentLibrary].includes(lockerNumber)) return;
 
-            // Show the popup on hover (only for non-available lockers)
-            listItem.addEventListener('mouseover', (event) => {
-                if (status !== 'available') {
-                    showPopup(event, data);  
-                }
-            });
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `
+        <span style="font-weight: bold;">${lockerNumber}:</span>
+        <span class="status-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: ${status === 'available' ? 'green' : 'red'}; margin-left: 10px;"></span>
+    `;
 
-            // Hide the popup when mouse leaves
+    listItem.addEventListener('mouseover', (event) => {
+        if (status !== 'available') {
+            showPopup(event, data);  
+        }
+    });
+            // Hide the popup when mouse leaves, but respect Alt key state
             listItem.addEventListener('mouseleave', () => {
-                hidePopup();
+                if (!isAltPressed) {  // Only hide the popup if Alt is NOT pressed
+                    hidePopup();
+                }
             });
 
             // Add cancel button for lockers that are in use
@@ -212,10 +220,11 @@ async function fetchLockerStatus() {
                 cancelButton.style.color = 'red';
                 cancelButton.style.cursor = 'pointer';
                 cancelButton.style.marginLeft = '10px';
-                cancelButton.style.fontSize = '16px'; 
+                cancelButton.style.fontSize = '14px'; 
 
                 cancelButton.addEventListener('click', async (e) => {
                     e.stopPropagation(); // Prevent the click from triggering the popup
+                    console.log("Cancel button clicked for locker:", lockerNumber);
 
                     const isConfirmed = window.confirm('Are you sure you want to cancel?');
                     if (isConfirmed) {
@@ -240,55 +249,110 @@ async function showPopup(event, lockerData) {
     const popup = document.getElementById('popup');
     const popupRecipientName = document.getElementById('popupRecipientName');
     const popupRecipientEmail = document.getElementById('popupRecipientEmail');
-    const popupBookDetails = document.getElementById('popupBookDetails');
+    const popupBookDetailsInput = document.getElementById('popupBookDetailsInput');
     const popupTransactionNumber = document.getElementById('popupTransactionNumber');
+    const saveButton = document.getElementById('saveButton');
+
+    if (!saveButton) {
+        console.error("Save button not found!");
+        return;
+    }
 
     // Populate popup fields
     popupRecipientName.textContent = lockerData.recipientName || 'N/A';
     popupRecipientEmail.textContent = lockerData.recipientEmail || 'N/A';
-    popupBookDetails.textContent = lockerData.bookDetails || 'N/A';
+    popupBookDetailsInput.value = lockerData.bookDetails || 'N/A';
     popupTransactionNumber.textContent = lockerData.transactionNumber || 'N/A';
 
-    // Position the popup relative to the list item
-    const listItem = event.target;
-    const rect = listItem.getBoundingClientRect();
-    popup.style.top = rect.top + window.scrollY + listItem.offsetHeight + 5 + 'px';
-    popup.style.left = rect.left + window.scrollX + 'px';
+    // Position the popup
+    const rect = event.target.getBoundingClientRect();
+    popup.style.top = `${rect.top + window.scrollY + event.target.offsetHeight + 5}px`;
+    popup.style.left = `${rect.left + window.scrollX}px`;
 
     // Show the popup
     popup.style.display = 'block';
 
-    // Fetch additional locker details from Firestore (optional)
-    const lockerRef = doc(db, "lockers", `locker_${lockerData.lockerNumber}`);
+    // Prevent closing popup when clicking inside it
+    popup.addEventListener('click', (event) => event.stopPropagation());
+    popupBookDetailsInput.addEventListener('click', (event) => event.stopPropagation());
+
+// Remove previous event listeners to avoid duplicates
+saveButton.replaceWith(saveButton.cloneNode(true));
+const newSaveButton = document.getElementById('saveButton');
+newSaveButton.addEventListener('click', () => saveHandler(lockerData));
+
+// Save Handler (moved outside to prevent re-declaration)
+async function saveHandler(lockerData) {
+    if (window.saveInProgress) return; // Prevent duplicate executions
+    window.saveInProgress = true;
+    setTimeout(() => window.saveInProgress = false, 500);
+
+    const updatedBookDetails = document.getElementById('popupBookDetailsInput').value;
+    
+    if (!lockerData?.lockerNumber) {
+        console.error("Locker number is missing, can't update Firestore.");
+        alert("Locker number is missing. Please check the locker details.");
+        return;
+    }
+
     try {
-        const lockerDoc = await getDoc(lockerRef);
-        if (lockerDoc.exists()) {
-            const lockerDataFromDB = lockerDoc.data();
-            const isbnImageURL = lockerDataFromDB.isbnImageURL;
+        const db = getFirestore();
+        const lockerQuery = query(collection(db, "lockers"), where("lockerNumber", "==", lockerData.lockerNumber));
+        const querySnapshot = await getDocs(lockerQuery);
 
-            // If ISBN image exists, display it in the popup
-            if (isbnImageURL) {
-                const lockerDetailsContainer = document.getElementById('lockerDetails');
-                if (lockerDetailsContainer) {
-                    lockerDetailsContainer.innerHTML = ''; // Clear existing image
-
-                    const imgElement = document.createElement('img');
-                    imgElement.src = isbnImageURL;
-                    imgElement.alt = 'ISBN Image';
-                    imgElement.style.maxWidth = '200px'; // Optional size limit
-
-                    lockerDetailsContainer.appendChild(imgElement);
-                } else {
-                    console.error("Element with ID 'lockerDetails' not found.");
-                }
-            } else {
-                console.log("No ISBN image URL found for this locker.");
-            }
-        } else {
-            console.error("Locker document does not exist.");
+        if (querySnapshot.empty) {
+            console.error("Locker not found.");
+            alert("Locker not found. Please check the locker number.");
+            return;
         }
+
+        const lockerDoc = querySnapshot.docs[0]; 
+        const lockerRef = lockerDoc.ref;
+
+        await updateDoc(lockerRef, { bookDetails: updatedBookDetails });
+
+        console.log('Locker details updated successfully');
+        showSuccessMessage();
+        hidePopup();
+
+        // Reload updated data into popup
+        const updatedLockerDoc = await getDoc(lockerRef);
+        updatePopupWithUpdatedData(updatedLockerDoc.data());
+
+        // Wait for 1 second before reloading the page to reflect changes
+        setTimeout(() => {
+            location.reload(); // Reload the page to display updated popup
+        }, 1000);
+
     } catch (error) {
-        console.error("Error fetching locker data:", error);
+        console.error('Error updating locker details:', error.message);
+        alert('Failed to update data. Please try again.');
+    }
+}
+    }
+
+// Function to show success message with smooth fade-out
+function showSuccessMessage() {
+    const successMessage = document.createElement('div');
+    successMessage.textContent = 'Data has been updated successfully.';
+    successMessage.classList.add('success-message');
+    
+    document.body.appendChild(successMessage);
+    successMessage.style.opacity = '1';
+    successMessage.style.transition = 'opacity 1s';
+
+    setTimeout(() => successMessage.style.opacity = '0', 2000);
+    setTimeout(() => successMessage.remove(), 3000);
+}
+
+// Function to update popup with new locker data
+function updatePopupWithUpdatedData(updatedData) {
+    const popupContent = document.getElementById('popup-content');
+    if (popupContent) {
+        popupContent.innerHTML = `
+            <h3>Locker ${updatedData.lockerNumber} Updated</h3>
+            <p><strong>Book Details:</strong> ${updatedData.bookDetails}</p>
+        `;
     }
 }
 
@@ -297,6 +361,51 @@ function hidePopup() {
     const popup = document.getElementById('popup');
     popup.style.display = 'none'; // Hide the popup
 }
+
+
+// Track if the Alt key is pressed
+let isAltPressed = false;
+
+// Listen for the 'Alt' key press to freeze/unfreeze popup behavior
+window.addEventListener('keydown', (event) => {
+    if (event.altKey) {
+        isAltPressed = true;  // Keep the popup visible when Alt is pressed
+    }
+});
+
+// Listen for the 'Alt' key release to allow popup to close again
+window.addEventListener('keyup', (event) => {
+    if (!event.altKey) {
+        isAltPressed = false;  // Unfreeze popup when Alt is released
+    }
+});
+
+// Close the popup only when clicking outside of it, unless Alt key is pressed
+let hidePopupTimeout;
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Alt') {
+        isAltPressed = true;
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'Alt') {
+        isAltPressed = false;
+    }
+});
+
+document.addEventListener('click', (event) => {
+    const popup = document.getElementById('popup');
+    
+    if (!popup.contains(event.target) && !isAltPressed) {
+        clearTimeout(hidePopupTimeout); // Prevent multiple triggers
+        hidePopupTimeout = setTimeout(() => {
+            hidePopup();
+        }, 100); // Debounce time (100ms)
+    }
+});
+
 
 // Function to cancel locker request
 async function cancelLockerRequest(lockerNumber) {
@@ -497,7 +606,7 @@ function extractISBN(bookDetails) {
 }
 
 
-// Handle locker assignment only on assignLockerButton click
+ // Handle locker assignment only on assignLockerButton click
 document.getElementById('assignLockerButton').addEventListener('click', async () => {
     const lockerRef = collection(db, "lockers");
     try {
