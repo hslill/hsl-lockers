@@ -254,6 +254,13 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
 
 #lockerList li {
   list-style-type: none; /* Remove bullets for all list items */
+  border: 1px solid white; /* Specify a solid border with white color */
+  border-radius: 1px; /* Optional: Adds rounded corners to the border */
+  padding: 10px; /* Adds padding inside the list item */
+  display: block; /* Makes the list item expand to fit its content */
+  min-width: 50px !important; /* Ensure it starts at 50px */
+  width: fit-content; /* Allows the width to grow based on content */
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
 }
 
 .status-icon {
@@ -572,3 +579,20 @@ footer a:after {
   padding: 10px;
   text-align: left;
 }
+
+.success-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  /* Center the message */
+  padding: 20px;
+  background-color: green;
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+  z-index: 9999;  /* Make sure it appears on top of other elements */
+  opacity: 1;
+  transition: opacity 1s ease;  /* Smooth fade-out effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
