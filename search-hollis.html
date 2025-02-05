@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Transactions</title>
+    <link rel="stylesheet" href="css/styles-main.css">
+    <!-- Add Tablesort library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+
+
+        <div class="logoutButton">
+          <!-- Content for logged-in users -->
+          <div id="content">
+            <button id="logout-button">Logout</button>
+          </div>
+        </div>
+    </head>
+        <body id="search-page">
+            <header>
+                <h1>Search Transactions</h1>
+            </header>
+            <main>
+                <section id="search-section">
+                    <input type="text" id="search-input" placeholder="Press ENTER for all, or enter details to filter" />
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" />
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" />
+                    <button id="search-button">Search</button>
+        
+                    <!-- Filter checkbox for canceled requests -->
+                    <label>
+                        <input type="checkbox" id="show-canceled"> Show only canceled requests
+
+                    </label>
+                </section>
+                
+                <section id="results-section">
+                    <table id="results-table" class="display">
+                        <thead>
+                            <tr>
+                                <th>Locker #</th>
+                                <th>Transaction Number</th>
+                                <th>Date Received</th>
+                                <th>Date Picked Up</th>
+                                <th>Date Canceled</th>
+                                <th>Book Details</th>
+                                <th>Recipient Email</th>
+                                <th>Recipient</th>
+                                <th>Locker Status</th>
+                                <th>Actions</th> <!-- Added column for cancel buttons -->
+                            </tr>
+                        </thead>               
+                        <tbody>
+                            <!-- Results will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+        
+                    <!-- Row for displaying results count -->
+                    <div id="results-count">
+                        <p>Total Results Found: <span id="total-results">0</span></p>
+                    </div>
+                </section>
+        
+                <!-- Buttons for exporting CSV, PDF, and Print -->
+                <div id="export-buttons">
+                    <button id="export-csv" class="btn">
+                        <i class="fas fa-file-csv"></i> Export
+                    </button>
+                    <button id="export-pdf" class="btn">
+                        <i class="fas fa-file-pdf"></i> Download
+                    </button>
+                    <button id="print-results" class="btn">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+        
+                <!-- Button for resetting search -->
+                <div id="buttonContainer">
+                    <input type="button" id="resetSearchButton" name="Reset" value="Reset">
+                    <a href="#" id="homeLink">Home</a>
+                </div>
+            </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js"; // Import Firebase Auth
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC17BbuCs63DFzBdxnFFeO-Ejv1WECS7-E",
+            authDomain: "book-pickup-kiosk01.firebaseapp.com",
+            projectId: "book-pickup-kiosk01",
+            storageBucket: "book-pickup-kiosk01.firebasestorage.app",
+            messagingSenderId: "77991134959",
+            appId: "1:77991134959:web:28dde2b643a22bed6abd1a"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); // Initialize Firebase Auth
+
+                // Check authentication status
+                onAuthStateChanged(auth, user => {
+            if (!user) {
+                // If the user is not authenticated, redirect to login page (index-hollis.html)
+                window.location.href = 'index-hollis.html';
+            } else {
+                // User is authenticated, proceed with loading the page
+                console.log("User is authenticated:", user.email);
+            }
+        });
+
+        async function searchTransactions(queryText) {
+    try {
+        console.log("Searching for:", queryText);
+
+        const resultsTable = document.getElementById("results-table").getElementsByTagName("tbody")[0];
+        resultsTable.innerHTML = ""; // Clear previous results
+        document.getElementById("total-results").innerText = "0"; // Reset the results count
+
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        const includeCanceled = document.getElementById("show-canceled").checked; // Get the checkbox value
+
+        function formatDate(rawDate) {
+            const [date, timeWithTimezone] = rawDate.split('T');
+            const [time, timezone] = timeWithTimezone.split(/(?<=\d)(?=[A-Za-z])/);
+
+            const [year, month, day] = date.split('-');
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthName = months[parseInt(month, 10) - 1];
+            const formattedDate = `${monthName} ${day} ${year}`;
+            const timeWithoutSeconds = time.slice(0, 5);
+            return `${formattedDate}, ${timeWithoutSeconds} ${timezone}`;
+        }
+
+        const transactionsRef = collection(db, "transactions");
+        const transactionsSnapshot = await getDocs(transactionsRef);
+
+        const lockersRef = collection(db, "lockers");
+        const lockerSnapshot = await getDocs(lockersRef);
+
+        // Map locker numbers to their statuses for easy lookup
+        const lockerStatusMap = {};
+        lockerSnapshot.forEach((doc) => {
+            const data = doc.data();
+            lockerStatusMap[doc.id] = data.status === "in-use" ? "In Use" : "Available";
+        });
+
+        console.log("Locker Status Map:", lockerStatusMap);  // Debugging: Check the locker status map
+
+        let resultsFound = 0; // Track the number of results found
+
+        transactionsSnapshot.forEach((doc) => {
+    const data = doc.data();
+    const dateReceived = (typeof data.dateReceived === 'string') ? data.dateReceived.split('T')[0] : null;
+    const datePickedup = (typeof data.datePickedup === 'string') ? data.datePickedup.split('T')[0] : null;
+    const dateCanceled = (typeof data.dateCanceled === 'string') ? data.dateCanceled.split('T')[0] : null;
+
+    if ((startDate && dateReceived && dateReceived < startDate) ||
+        (endDate && dateReceived && dateReceived > endDate)) {
+        return;
+    }
+
+    const fieldsToSearch = [
+        data.bookDetails,
+        data.recipientEmail,
+        data.recipientName,
+        doc.id
+    ];
+
+    const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+
+    if (!includeCanceled) {
+        if (matchesQuery) {
+            resultsFound++;
+            const row = resultsTable.insertRow();
+
+            const lockerStatusKey = `locker_${data.lockerNumber}`;
+            const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown";
+
+            // Check if Date Picked Up or Date Canceled is populated and hide cancel button accordingly
+            const cancelButton = (datePickedup || dateCanceled) ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`;
+
+            row.innerHTML = `
+                <td>${data.lockerNumber}</td>
+                <td>${doc.id}</td>
+                <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td>
+                <td>${data.bookDetails || "N/A"}</td>
+                <td>${data.recipientEmail || "N/A"}</td>
+                <td>${data.recipientName || "N/A"}</td>
+                <td>${lockerStatus}</td>
+                <td>${cancelButton}</td>
+            `;
+        }
+    } else {
+        if (matchesQuery && dateCanceled) {
+            resultsFound++;
+            const row = resultsTable.insertRow();
+
+            const lockerStatusKey = `locker_${data.lockerNumber}`;
+            const lockerStatus = lockerStatusMap[lockerStatusKey] || "Unknown";
+
+            // Check if Date Picked Up or Date Canceled is populated and hide cancel button accordingly
+            const cancelButton = (datePickedup || dateCanceled) ? '' : `<button class="cancel-btn" data-doc-id="${doc.id}">Cancel</button>`;
+
+            row.innerHTML = `
+                <td>${data.lockerNumber}</td>
+                <td>${doc.id}</td>
+                <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
+                <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
+                <td>${dateCanceled ? formatDate(data.dateCanceled) : "N/A"}</td>
+                <td>${data.bookDetails || "N/A"}</td>
+                <td>${data.recipientEmail || "N/A"}</td>
+                <td>${data.recipientName || "N/A"}</td>
+                <td>${lockerStatus}</td>
+                <td>${cancelButton}</td>
+            `;
+        }
+    }
+});
+
+        // If no results were found in collections
+        if (resultsFound === 0) {
+            alert(`No results found for the entered search term: "${queryText}"`);
+        }
+
+        // Update the results count
+        document.getElementById("total-results").innerText = resultsFound;
+
+        // Initialize Tablesort
+        const table = document.getElementById("results-table");
+        const tablesort = new Tablesort(table);
+
+        // Add sortable class to headers for CSS styling
+        const headers = table.querySelectorAll("th");
+        headers.forEach(header => {
+            if (header.textContent !== "") { // Ensure it’s a valid header
+                header.classList.add("sortable");
+            }
+        });
+
+        table.addEventListener("beforeSort", function (e) {
+            console.log(e.detail);
+            const th = e.target;
+            const isAsc = e.detail.direction === "asc";
+            headers.forEach(header => header.classList.remove("asc", "desc"));
+            th.classList.add(isAsc ? "asc" : "desc");
+        });
+
+        // Add event listener to cancel buttons
+        const cancelBtns = document.querySelectorAll(".cancel-btn");
+        cancelBtns.forEach(button => {
+            button.addEventListener("click", cancelRequest); // Assigning cancelRequest function here
+        });
+
+    } catch (error) {
+        console.error("Error fetching transactions:", error);
+    }
+}
+
+// The cancelRequest function to update the transaction as canceled
+function cancelRequest(event) {
+    const transactionId = event.target.getAttribute("data-doc-id");
+
+    // Get the current time formatted in EDT
+    const now = moment().tz("America/New_York");  // Get current time in EDT
+    const formattedDate = now.format("YYYY-MM-DDThh:mm:ssA-") + now.format("z");  // Format as '2025-01-29T09:51:16PM-EST'
+
+    // Mark the transaction as canceled with the formatted date
+    const transactionRef = doc(db, "transactions", transactionId);
+    updateDoc(transactionRef, {
+        dateCanceled: formattedDate // Use the formatted date for cancellation
+    }).then(() => {
+        console.log("Transaction canceled:", transactionId);
+        searchTransactions(""); // Refresh the results after canceling
+    }).catch((error) => {
+        console.error("Error canceling transaction:", error);
+    });
+}
+
+// Event listener for DOMContentLoaded
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Search page loaded.");
+});
+
+document.getElementById("search-button").addEventListener("click", () => {
+    const searchText = document.getElementById("search-input").value;
+    searchTransactions(searchText);
+});
+
+let initialSearchPerformed = false;
+
+// Listen for the initial search
+document.getElementById("search-button").addEventListener("click", () => {
+    initialSearchPerformed = true; // Set flag when initial search is performed
+});
+
+// Listen for checkbox changes to trigger search
+document.getElementById("show-canceled").addEventListener("click", () => {
+    if (initialSearchPerformed) {
+        const searchText = document.getElementById("search-input").value;
+        searchTransactions(searchText);
+    }
+});
+
+// Reset search form functionality
+document.getElementById("resetSearchButton").addEventListener("click", function () {
+    document.getElementById("search-input").value = "";
+    document.getElementById("start-date").value = "";
+    document.getElementById("end-date").value = "";
+    document.getElementById("include-canceled").checked = false;
+    searchTransactions(""); // Clear search results
+});
+
+
+        // Add keyboard accessibility
+        document.getElementById("search-button").addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault(); // Prevent default behavior for space key
+                const queryText = document.getElementById("search-input").value.trim();
+                if (queryText) {
+                    searchTransactions(queryText);
+                } else {
+                    alert("Please enter a search term.");
+                }
+            }
+        });
+
+        // Attach the event listener to the button
+        const resetSearchButton = document.getElementById("resetSearchButton");
+        resetSearchButton.addEventListener("click", () => {
+            // Reload the page to reset the search
+            window.location.reload();
+        });
+
+        document.getElementById("homeLink").addEventListener("click", (event) => {
+            event.preventDefault();  // Prevent default anchor behavior
+            window.location.href = "index-hollis.html";  // Redirect to home page (adjust the URL as needed)
+        });
+
+// Export to CSV
+document.getElementById("export-csv").addEventListener("click", function () {
+    const table = document.getElementById("results-table");
+    const headers = table.querySelectorAll("thead th");
+    const rows = table.querySelectorAll("tbody tr");
+
+    // Extract headers
+    const headerData = [];
+    headers.forEach(header => {
+        headerData.push(header.textContent.trim());
+    });
+
+    const data = [headerData]; // Start the data array with headers
+
+    // Extract row data
+    rows.forEach(row => {
+        const rowData = [];
+        row.querySelectorAll("td").forEach(cell => {
+            rowData.push(cell.textContent.trim());
+        });
+        data.push(rowData);
+    });
+
+    // Use PapaParse to convert data to CSV and download
+    const csv = Papa.unparse(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'search_results.csv';
+    link.click();
+});
+
+
+// Export to PDF
+document.getElementById("export-pdf").addEventListener("click", function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'letter');  // Set portrait orientation (p), millimeters as units (mm), letter size
+    
+    const table = document.getElementById("results-table");
+    const rows = table.querySelectorAll("tbody tr");
+    
+    let y = 20;  // Start below the top margin
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Define margins with narrower left and right margins
+    const marginLeft = 10;   // Narrow left margin
+    const marginRight = 10;  // Narrow right margin
+    const marginTop = 20;   // Top margin
+    const marginBottom = 20;  // Bottom margin
+    
+    // Set font size to default (approx 10px)
+    doc.setFontSize(10);
+
+    // Function to wrap text and prevent overflow
+    function wrapText(text, maxWidth) {
+        return doc.splitTextToSize(text, maxWidth);
+    }
+
+    // Loop through each row in the table and format the output
+    rows.forEach(row => {
+        const rowData = {};
+        row.querySelectorAll("td").forEach((cell, index) => {
+            const header = [
+                "Locker #", 
+                "Transaction Number", 
+                "Date Received", 
+                "Date Picked Up",
+                "Date Canceled",
+                "Book Details", 
+                "Recipient Email", 
+                "Recipient", 
+                "Locker Status"
+            ][index]; // Define the headers based on the order in the table
+            rowData[header] = cell.textContent.trim(); // Store the data under its header
+        });
+
+        // Create each 'table' by printing each key-value pair
+        Object.keys(rowData).forEach((header, i) => {
+            const lineText = `${header} | ${rowData[header]}`;
+            const wrappedLine = wrapText(lineText, pageWidth - marginLeft - marginRight);
+            doc.text(wrappedLine, marginLeft, y);  // Apply left margin
+            y += wrappedLine.length * 2 + 5; // Space between rows
+            
+            // If the current section is "Book Details", add an extra space before the next section
+            if (header === "Book Details") {
+                y += 5; // Add extra space before printing "Recipient Email"
+            }
+            
+            // Check if the content exceeds the page height, and create a new page if necessary
+            if (y > pageHeight - marginBottom) {
+                doc.addPage();
+                y = marginTop;  // Reset the y position after page break
+            }
+        });
+
+        // Add some space between "tables"
+        y += 10;
+    });
+
+    // Save PDF
+    doc.save('search_results.pdf');
+});
+
+// Print Results
+document.getElementById("print-results").addEventListener("click", function () {
+    window.print();
+});
+
+// Handle logout
+document.getElementById('logout-button').addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+        document.getElementById('content').style.display = 'none';
+    } catch (error) {
+        console.error("Error logging out:", error.message);
+    }
+});
+
+    </script>
+
+    <!-- Add Tablesort JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js"></script>
+    <!-- PapaParse for CSV Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<!-- jsPDF for PDF Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<script src="firebase-functions.js"></script>
+
+</body>
+</html>
