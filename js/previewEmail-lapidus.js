@@ -80,7 +80,7 @@ async function updateEmailPreview() {
         <p>You have material available for pickup at the <a href="https://hsl.med.nyu.edu/libraries/sid-and-ruth-lapidus-health-sciences-library" target="_blank" rel="noopener">Sid and Ruth Lapidus Health Sciences Library:</a></p>
         <p>${bookDetails || "[Book Details]"}</p>
         <p>Our pickup service operates 24/7, allowing you to retrieve it at any time. Please head to the kiosk located near the book lockers. You have two options to complete the process:</p>
-        <img src="https://libapps.s3.amazonaws.com/accounts/129950/images/BookLockerPickup.JPG" width="187" height="240" alt="Book Locker Pickup Image">
+        <img src="https://d2jv02qf7xgjwx.cloudfront.net/accounts/129950/images/lapidus-lockers.jpg" width="auto" height="250" alt="Book Locker Pickup Image">
         <ol>
             <li>Scan the barcode below using the handheld scanner provided at the kiosk.</li>
             <li>Alternatively, you can enter the Transaction Number displayed below the barcode and press ENTER or click the Submit button.</li>
