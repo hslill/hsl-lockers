@@ -1,5 +1,5 @@
 // Initialize EmailJS
-emailjs.init("WyYEU_8XtbqQYPJzD");  // Replace with your actual public key
+emailjs.init("qyLLqnBmF7BYPrdLZ");  // Replace with your actual public key
 
 function sendEmail() {
     // Form submission event listener
@@ -62,7 +62,7 @@ function sendEmail() {
                         console.log("Data being sent to EmailJS:", emailData);
 
                         // Send the email using EmailJS
-                        emailjs.send("pickup", "book_pickup", emailData)
+                        emailjs.send("pickup", "book_pickup_robbins", emailData)
                             .then((response) => {
                                 console.log('Email sent successfully!', response);
                                 alert('Email sent successfully!');
@@ -96,7 +96,7 @@ function sendEmail() {
             };
 
             // Send the email using EmailJS
-            emailjs.send("pickup", "book_pickup", emailData)
+            emailjs.send("pickup", "book_pickup_robbins", emailData)
                 .then((response) => {
                     console.log('Email sent successfully!', response);
                     alert('Email sent successfully!');
