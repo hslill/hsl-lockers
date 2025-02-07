@@ -8,7 +8,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
         (function(){
-            emailjs.init("WyYEU_8XtbqQYPJzD");  // The actual EmailJS public key
+            emailjs.init("qyLLqnBmF7BYPrdLZ");  // The actual EmailJS public key
         })(); 
         </script>
 
@@ -420,7 +420,7 @@ function sendPickupEmail(recipientName, bookDetails, transactionNumber) {
     };
 
     // Send the email using EmailJS to notify the staff
-    emailjs.send("pickup", "pickup_receipt", emailParams)
+    emailjs.send("pickup", "pickup_receipt_robbins", emailParams)
         .then((response) => {
             console.log("Email sent successfully!", response.status, response.text);
         })
