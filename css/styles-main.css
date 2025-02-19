@@ -596,3 +596,47 @@ footer a:after {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Dropdown Menu */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #2b2b2b;
+  min-width: 160px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: white;
+  padding: 10px 14px; /* Adjusted padding */
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Hamburger Menu - shown on smaller screens */
+.hamburger-icon {
+  display: none;
+  font-size: 30px;
+  cursor: pointer;
+  padding: 10px;
+}
+
+/* Show the hamburger menu on smaller screens */
+@media screen and (max-width: 600px) {
+  nav ul {
+      display: none;
+      flex-direction: column;
+  }
+
+  nav ul.active {
+      display: flex;
+  }
+
+  .hamburger-icon {
+      display: block;
+  }
+}
+
