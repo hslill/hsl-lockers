@@ -140,7 +140,7 @@
         <div id="lockerDetails"></div>
 
         <footer>
-            <p>Data source: <a href="https://console.firebase.google.com/project/book-pickup-kiosk01/firestore/databases/-default-/data/~2Flockers~2Flocker_32" target="_blank">Firebase</a> | Email Manager: <a href="https://dashboard.emailjs.com/sign-in" target="_blank">EmailJS</a> | Webhost: <a href="https://github.com/hslill/lohlockers" target="_blank">GitHub</a></p>
+            <p>Data source: <a href="https://console.firebase.google.com/project/book-pickup-kiosk01/firestore/databases/-default-/data/~2Flockers~2Flocker_32" target="_blank">Firebase</a> | Email Manager: <a href="https://dashboard.emailjs.com/admin/templates/f1au81t/content" target="_blank">EmailJS</a> | Webhost: <a href="https://github.com/hslill/lohlockers" target="_blank">GitHub</a></p>
         </footer>
 
 <script type="module">
@@ -162,12 +162,12 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
     const auth = getAuth(app); // Initialize Firebase Authentication
-
+    
     function toggleMenu() {
     const menu = document.querySelector('nav ul');
     menu.classList.toggle('active');
 }
-    
+
 // Function to show the popup with locker details
 let isLockerStatusFetched = false;
 
