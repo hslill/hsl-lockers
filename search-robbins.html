@@ -175,7 +175,8 @@
         doc.id
     ];
 
-    const matchesQuery = fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+    const matchesQuery = queryText.trim() === "" || 
+    fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
 
     if (!includeCanceled) {
         if (matchesQuery) {
