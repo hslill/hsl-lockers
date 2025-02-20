@@ -108,8 +108,8 @@
                 // Check authentication status
                 onAuthStateChanged(auth, user => {
             if (!user) {
-                // If the user is not authenticated, redirect to login page (index-hollis.html)
-                window.location.href = 'index-hollis.html';
+                // If the user is not authenticated, redirect to login page (index-robbins.html)
+                window.location.href = 'index-robbins.html';
             } else {
                 // User is authenticated, proceed with loading the page
                 console.log("User is authenticated:", user.email);
@@ -175,8 +175,8 @@
         doc.id
     ];
 
-const matchesQuery = queryText.trim() === "" || 
-    fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+    const matchesQuery = queryText.trim() === "" || 
+    fieldsToSearch.some(field => typeof field === 'string' && field.toLowerCase().includes(queryText.toLowerCase()));
 
     if (!includeCanceled) {
         if (matchesQuery) {
@@ -345,7 +345,7 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
 
         document.getElementById("homeLink").addEventListener("click", (event) => {
             event.preventDefault();  // Prevent default anchor behavior
-            window.location.href = "index-hollis.html";  // Redirect to home page (adjust the URL as needed)
+            window.location.href = "index-robbins.html";  // Redirect to home page (adjust the URL as needed)
         });
 
 // Export to CSV
