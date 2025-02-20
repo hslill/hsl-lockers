@@ -176,7 +176,7 @@
     ];
 
     const matchesQuery = queryText.trim() === "" || 
-    fieldsToSearch.some(field => field && field.toLowerCase().includes(queryText.toLowerCase()));
+    fieldsToSearch.some(field => typeof field === 'string' && field.toLowerCase().includes(queryText.toLowerCase()));
 
     if (!includeCanceled) {
         if (matchesQuery) {
