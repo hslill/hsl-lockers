@@ -9,8 +9,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Record</h2>
 
+            <input type="text" id="edit-transaction" placeholder="Transaction Number">
+            <input type="text" id="edit-barcode" placeholder="Barcode URL">
+    
+            <label for="edit-locker">Locker #:</label>
+            <input type="text" id="edit-locker" readonly>
+    
+            <label for="edit-book">Book Details:</label>
+            <textarea id="edit-book" rows="4" style="resize: both; overflow: auto;"></textarea>         
+    
+            <label for="edit-email">Recipient Email:</label>
+            <input type="text" id="edit-email">
+    
+            <label for="edit-name">Recipient Name:</label>
+            <input type="text" id="edit-name">
+    
+            <!-- Notify recipient checkbox -->
+            <label for="notifyRecipientCheckbox">
+                <input type="checkbox" id="notifyRecipientCheckbox"> Notify recipient by email
+            </label>
+            <input style="display: none;" class="textarea" id="notificationForm">
+    
+            <button id="save-edit">Save Changes</button>
+        </div>
+    </div>
+    
 
         <div class="logoutButton">
           <!-- Content for logged-in users -->
@@ -91,7 +121,8 @@
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-storage.js";
         import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js"; // Import Firebase Auth
-
+        // Initialize EmailJS
+emailjs.init("qyLLqnBmF7BYPrdLZ");
         const firebaseConfig = {
             apiKey: "AIzaSyC17BbuCs63DFzBdxnFFeO-Ejv1WECS7-E",
             authDomain: "book-pickup-kiosk01.firebaseapp.com",
@@ -200,6 +231,9 @@
                 <td>${data.recipientName || "N/A"}</td>
                 <td>${lockerStatus}</td>
                 <td>${cancelButton}</td>
+                <button class="edit-btn" data-doc-id="${doc.id}" data-locker="${data.lockerNumber}" data-book="${data.bookDetails}" 
+        data-email="${data.recipientEmail}" data-name="${data.recipientName}"data-transaction-number="${data.transactionNumber}">Edit</button>
+
             `;
         }
     } else {
@@ -224,6 +258,9 @@
                 <td>${data.recipientName || "N/A"}</td>
                 <td>${lockerStatus}</td>
                 <td>${cancelButton}</td>
+                <button class="edit-btn" data-doc-id="${doc.id}" data-locker="${data.lockerNumber}" data-book="${data.bookDetails}" 
+        data-email="${data.recipientEmail}" data-name="${data.recipientName}"data-transaction-number="${data.transactionNumber}">Edit</button>
+
             `;
         }
     }
@@ -318,7 +355,7 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
     document.getElementById("search-input").value = "";
     document.getElementById("start-date").value = "";
     document.getElementById("end-date").value = "";
-    document.getElementById("include-canceled").checked = false;
+    document.getElementById("show-canceled").checked = false;
     searchTransactions(""); // Clear search results
 });
 
@@ -467,6 +504,152 @@ document.getElementById('logout-button').addEventListener('click', async () => {
     }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("edit-modal");
+    const closeModal = document.querySelector(".close");
+    const saveEditBtn = document.getElementById("save-edit");
+    const transactionInput = document.getElementById("edit-transaction");
+    const barcodeInput = document.getElementById("edit-barcode");
+
+    let currentDocId = null; // Store document ID being edited
+
+    // Function to generate barcode URL dynamically
+    function generateBarcode(transactionNumber) {
+        if (!transactionNumber.trim()) {
+            return ""; // Return empty string if no transaction number
+        }
+
+        return `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(transactionNumber)}&scale=3&height=10`;
+    }
+
+    // Update barcode field whenever transaction number changes
+    transactionInput.addEventListener("input", () => {
+        const transactionNumber = transactionInput.value.trim();
+        const barcodeUrl = generateBarcode(transactionNumber);
+        barcodeInput.value = barcodeUrl; // Update hidden input with barcode URL
+    });
+
+    // Open modal when Edit button is clicked
+    document.addEventListener("click", (event) => {
+        if (event.target.classList.contains("edit-btn")) {
+            const btn = event.target;
+            currentDocId = btn.dataset.docId; 
+
+            document.getElementById("edit-locker").value = btn.dataset.locker;
+            document.getElementById("edit-book").value = btn.dataset.book;
+            document.getElementById("edit-email").value = btn.dataset.email;
+            document.getElementById("edit-name").value = btn.dataset.name;
+
+            // Populate the transaction number (edit-transaction) field
+            const transactionNumber = btn.dataset.transactionNumber;  // Assuming transaction number is in data-transaction-number
+            document.getElementById("edit-transaction").value = transactionNumber;
+            document.getElementById("edit-barcode").value = generateBarcode(transactionNumber);
+
+            modal.style.display = "block";
+        }
+    });
+
+    // Close modal
+    closeModal.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Save changes to Firestore
+    saveEditBtn.addEventListener("click", async () => {
+        if (currentDocId) {
+            const updatedData = {
+                transactionNumber: document.getElementById("edit-transaction").value,
+                barcodeUrl: document.getElementById("edit-barcode").value,
+                bookDetails: document.getElementById("edit-book").value,
+                recipientEmail: document.getElementById("edit-email").value,
+                recipientName: document.getElementById("edit-name").value
+            };
+
+            try {
+                const docRef = doc(db, "transactions", currentDocId);
+                await updateDoc(docRef, updatedData);
+                alert("Record updated successfully!");
+                modal.style.display = "none";
+                searchTransactions(""); // Refresh table
+            } catch (error) {
+                console.error("Error updating record:", error);
+                alert("Failed to update record.");
+            }
+        }
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    // Event listener for Save Changes button
+    saveEditBtn.addEventListener('click', function () {
+        // Get values from input fields
+        const recipientName = document.getElementById('edit-name').value.trim();
+        const recipientEmail = document.getElementById('edit-email').value.trim();
+        const bookDetails = document.getElementById('edit-book').value.trim();
+        const lockerNumber = document.getElementById('edit-locker').value.trim();
+
+        // Ensure all necessary fields are filled before sending email
+        if (!recipientName || !recipientEmail || !bookDetails || !lockerNumber) {
+            console.error("Missing required fields. Email will not be sent.");
+            return;
+        }
+
+        console.log("Save button clicked. Sending email if checkbox is checked...");
+        sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber);
+    });
+});
+
+
+// Function to send email
+function sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber) {
+    const notifyRecipientCheckbox = document.getElementById('notifyRecipientCheckbox');
+    
+    if (!notifyRecipientCheckbox) {
+        console.error("notifyRecipientCheckbox not found.");
+        return;
+    }
+
+    if (!notifyRecipientCheckbox.checked) {
+        console.log("Checkbox is not checked. Email won't be sent.");
+        return;
+    }
+
+    // Retrieve transaction number and barcode URL from input fields
+    const transactionNumber = document.getElementById("edit-transaction").value.trim();
+    const barcodeUrl = document.getElementById("edit-barcode").value.trim();
+
+    if (!transactionNumber || !barcodeUrl) {
+        console.error("Missing transaction number or barcode URL. Email will not be sent.");
+        return;
+    }
+
+    const emailData = {
+        recipientName,
+        recipientEmail,
+        bookDetails,
+        lockerNumber,
+        transactionNumberField: transactionNumber, // Matches EmailJS template
+        barcode_url: barcodeUrl  // Matches EmailJS template
+    };
+
+    console.log("Sending email with data:", emailData);
+
+    emailjs.send("pickup", "book_pickup_robbins", emailData)
+        .then((response) => {
+            console.log('Email sent successfully!', response);
+            alert('Email sent successfully!');
+        })
+        .catch((error) => {
+            console.error('Failed to send email:', error);
+            alert('Failed to send email!');
+        });
+}
+
     </script>
 
     <!-- Add Tablesort JS -->
@@ -481,6 +664,8 @@ document.getElementById('logout-button').addEventListener('click', async () => {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <script src="firebase-functions.js"></script>
+<script src="js/sendEmail-robbins.js"></script>
+<script src="js/generateBarcode.js"></script>
 
 </body>
 </html>
