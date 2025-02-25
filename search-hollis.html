@@ -515,8 +515,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to generate barcode URL dynamically
     function generateBarcode(transactionNumber) {
-        if (!transactionNumber.trim()) {
-            return ""; // Return empty string if no transaction number
+        if (!transactionNumber) {
+        // If the transaction number is somehow missing or undefined, return a fallback URL or handle the error case
+            console.error("Transaction number is missing");
+        return "fallback-barcode-url";  // or handle appropriately
         }
 
         return `https://bwipjs-api.metafloor.com/?bcid=code128&text=${encodeURIComponent(transactionNumber)}&scale=3&height=10`;
