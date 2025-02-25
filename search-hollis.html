@@ -568,18 +568,19 @@ saveEditBtn.addEventListener("click", async () => {
         try {
             // Get the locker number from the modal
             let lockerNumber = document.getElementById("edit-locker").value;
-            
-            // Remove 'locker_' prefix if it exists
-            if (lockerNumber.startsWith('locker_')) {
-                lockerNumber = lockerNumber.replace('locker_', '');
-            }
+
+            // Remove 'locker_' prefix ONLY for the 'transactions' collection
+            const lockerNumberForTransaction = lockerNumber.startsWith('locker_') ? lockerNumber.replace('locker_', '') : lockerNumber;
 
             // Reference the 'transactions' collection and update it
             const docRef = doc(db, "transactions", currentDocId);
-            await updateDoc(docRef, updatedData);
+            await updateDoc(docRef, {
+                ...updatedData,
+                lockerNumber: lockerNumberForTransaction // Save only the locker number (without 'locker_' prefix)
+            });
 
-            // Reference the 'lockers' collection using the locker number
-            const lockerRef = doc(db, "lockers", `locker_${lockerNumber}`); // Use locker_33, locker_34, etc.
+            // Reference the 'lockers' collection and update the locker information
+            const lockerRef = doc(db, "lockers", `locker_${lockerNumber}`); // Keep the 'locker_' prefix for the lockers collection
             await updateDoc(lockerRef, {
                 bookDetails: document.getElementById("edit-book").value  // Update bookDetails in the lockers collection
             });
