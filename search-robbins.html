@@ -554,29 +554,46 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = "none";
     });
 
-    // Save changes to Firestore
-    saveEditBtn.addEventListener("click", async () => {
-        if (currentDocId) {
-            const updatedData = {
-                transactionNumber: document.getElementById("edit-transaction").value,
-                barcodeUrl: document.getElementById("edit-barcode").value,
-                bookDetails: document.getElementById("edit-book").value,
-                recipientEmail: document.getElementById("edit-email").value,
-                recipientName: document.getElementById("edit-name").value
-            };
+// Save changes to Firestore
+saveEditBtn.addEventListener("click", async () => {
+    if (currentDocId) {
+        const updatedData = {
+            transactionNumber: document.getElementById("edit-transaction").value,
+            barcodeUrl: document.getElementById("edit-barcode").value,
+            bookDetails: document.getElementById("edit-book").value,
+            recipientEmail: document.getElementById("edit-email").value,
+            recipientName: document.getElementById("edit-name").value
+        };
 
-            try {
-                const docRef = doc(db, "transactions", currentDocId);
-                await updateDoc(docRef, updatedData);
-                alert("Record updated successfully!");
-                modal.style.display = "none";
-                searchTransactions(""); // Refresh table
-            } catch (error) {
-                console.error("Error updating record:", error);
-                alert("Failed to update record.");
+        try {
+            // Get the locker number from the modal
+            let lockerNumber = document.getElementById("edit-locker").value;
+            
+            // Remove 'locker_' prefix if it exists
+            if (lockerNumber.startsWith('locker_')) {
+                lockerNumber = lockerNumber.replace('locker_', '');
             }
+
+            // Reference the 'transactions' collection and update it
+            const docRef = doc(db, "transactions", currentDocId);
+            await updateDoc(docRef, updatedData);
+
+            // Reference the 'lockers' collection using the locker number
+            const lockerRef = doc(db, "lockers", `locker_${lockerNumber}`); // Use locker_33, locker_34, etc.
+            await updateDoc(lockerRef, {
+                bookDetails: document.getElementById("edit-book").value  // Update bookDetails in the lockers collection
+            });
+
+            alert("Record and locker updated successfully!");
+            modal.style.display = "none";
+            searchTransactions(""); // Refresh table
+
+        } catch (error) {
+            console.error("Error updating record:", error);
+            alert("Failed to update record.");
         }
-    });
+    }
+});
 
     // Close modal when clicking outside
     window.addEventListener("click", (event) => {
