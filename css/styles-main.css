@@ -678,3 +678,30 @@ footer a:after {
   font-size: 24px;
   cursor: pointer;
 }
+/* Style the header for sorting */
+th.sortable {
+    cursor: pointer;
+    position: relative;
+    padding-right: 20px; /* Space for the arrow */
+}
+
+/* Up and Down arrows */
+th.sortable.asc::after {
+    content: "↑"; /* Up arrow */
+    position: absolute;
+    right: 5px;
+    font-size: 14px;
+}
+
+th.sortable.desc::after {
+    content: "↓"; /* Down arrow */
+    position: absolute;
+    right: 5px;
+    font-size: 14px;
+}
+
+/* Optional: Add hover effect to the headers */
+th.sortable:hover {
+    background-color: #f0f0f0;
+}
+
