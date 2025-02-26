@@ -274,25 +274,32 @@ emailjs.init("qyLLqnBmF7BYPrdLZ");
         // Update the results count
         document.getElementById("total-results").innerText = resultsFound;
 
-        // Initialize Tablesort
-        const table = document.getElementById("results-table");
-        const tablesort = new Tablesort(table);
+// Initialize Tablesort
+const table = document.getElementById("results-table");
+if (table) {
+    const tablesort = new Tablesort(table);
 
-        // Add sortable class to headers for CSS styling
-        const headers = table.querySelectorAll("th");
-        headers.forEach(header => {
-            if (header.textContent !== "") { // Ensure it’s a valid header
-                header.classList.add("sortable");
-            }
-        });
+    // Add sortable class to headers for CSS styling
+    const headers = table.querySelectorAll("th");
+    headers.forEach(header => {
+        if (header.textContent !== "") { // Ensure it’s a valid header
+            header.classList.add("sortable");
+        }
+    });
 
-        table.addEventListener("beforeSort", function (e) {
-            console.log(e.detail);
+    table.addEventListener("sort", function (e) {
+        console.log(e.detail);  // Log the e.detail object in the sort event
+
+        if (e.detail && e.detail.direction) {  // Check if e.detail and e.detail.direction are available
             const th = e.target;
             const isAsc = e.detail.direction === "asc";
             headers.forEach(header => header.classList.remove("asc", "desc"));
             th.classList.add(isAsc ? "asc" : "desc");
-        });
+        } else {
+            console.error("Sorting direction is not available in e.detail.");
+        }
+    });
+}
 
         // Add event listener to cancel buttons
         const cancelBtns = document.querySelectorAll(".cancel-btn");
