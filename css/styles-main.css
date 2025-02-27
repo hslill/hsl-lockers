@@ -12,6 +12,7 @@ body {
   box-sizing: border-box;
 }
 
+
 form {
   margin-top: 50px;
   margin-bottom: 100px;
@@ -359,8 +360,6 @@ nav ul li:hover::after {
 thead {
   background-color: lightgray; /* Light gray background */
   color: black;
-  border: 1px solid black;   /* 1px black border */
-  box-shadow: 1px 1px 1px black;
 }
 
 /* Hides the entire row but makes Locker Status visible */
@@ -677,6 +676,13 @@ footer a:after {
   font-size: 24px;
   cursor: pointer;
 }
+
+/* Disable hover effect for the "Select" header */
+th.no-hover {
+    pointer-events: none; /* Disable hover and click events */
+    background-color: lightgray;
+}
+
 /* Style the header for sorting */
 th.sortable {
     cursor: pointer;
@@ -703,4 +709,3 @@ th.sortable.desc::after {
 th.sortable:hover {
     background-color: #f0f0f0;
 }
-
