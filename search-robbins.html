@@ -756,6 +756,8 @@ function sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber) {
             alert('Failed to send email!');
         });
 }
+        
+let hiddenRows = []; // Array to store hidden rows
 
 function addSelectColumn() {
     const table = document.getElementById("results-table");
@@ -808,25 +810,44 @@ function addSelectColumn() {
     const filterButton = document.createElement("button");
     filterButton.id = "filter-selections";
     filterButton.textContent = "Filter Selections";
-    filterButton.addEventListener("click", filterSelectedRows);
+    filterButton.addEventListener("click", toggleFilterSelections);
 
     table.parentElement.appendChild(filterButton);
 }
 
-function filterSelectedRows() {
+function toggleFilterSelections() {
     const checkboxes = document.querySelectorAll(".select-checkbox");
-    checkboxes.forEach((checkbox) => {
-        const row = checkbox.closest("tr");
-        if (!checkbox.checked) {
-            row.remove();  // Remove unselected rows completely
-        }
-    });
+    const tableRows = document.querySelectorAll("#results-table tbody tr");
+    const filterButton = document.getElementById("filter-selections");
+
+    let anyRowHidden = hiddenRows.length > 0;
+
+    if (anyRowHidden) {
+        // Restore hidden rows
+        hiddenRows.forEach(row => {
+            row.style.display = '';  // Reset the display style to its default
+        });
+        hiddenRows = [];  // Clear the hidden rows array
+
+        // Change the button text to "Filter Selections"
+        filterButton.textContent = "Filter Selections";
+    } else {
+        // Filter selected rows (hide unselected ones)
+        checkboxes.forEach((checkbox, index) => {
+            const row = tableRows[index];
+            if (!checkbox.checked) {
+                row.style.display = 'none';  // Hide unselected rows
+                hiddenRows.push(row);  // Add to hidden rows array
+            }
+        });
+
+        // Change the button text to "Restore all rows"
+        filterButton.textContent = "Show All Rows";
+    }
 }
 
 // Run function after table is populated
 document.addEventListener("DOMContentLoaded", addSelectColumn);
-
-
     </script>
 
     <!-- Add Tablesort JS -->
