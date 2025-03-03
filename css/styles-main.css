@@ -714,19 +714,22 @@ th.sortable:hover {
 .help-sidebar {
   position: fixed;
   top: 0;
-  right: -100%;
-  width: 900px;
+  right: -550px; /* Ensure it's fully hidden initially */
+  width: 550px;
   height: 100%;
   background-color: #f1f1f1;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-  overflow-y: auto;
+  box-shadow: -2px 0 5px darkgray;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  overflow-y: auto; /* Enables vertical scrolling */
   transition: right 0.3s ease;
   z-index: 1000;
+  border: 3px solid lightgray; /* Frame around sidebar */
 }
 
 .help-sidebar iframe {
   border: none;
   height: 100%;
+  min-width: 800px;
 }
 
 .sidebar-header {
@@ -735,6 +738,11 @@ th.sortable:hover {
   color: white;
   text-align: center;
   font-weight: bold;
+}
+
+.sidebar-header span {
+  font-weight: bold;
+  font-size: 18px;
 }
 
 #close-sidebar {
