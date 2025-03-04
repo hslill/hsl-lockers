@@ -823,11 +823,47 @@ function toggleFilterSelections() {
     let anyRowHidden = hiddenRows.length > 0;
 
     if (anyRowHidden) {
-        // Restore hidden rows
+        // Restore hidden rows and ensure checkboxes are restored
         hiddenRows.forEach(row => {
             row.style.display = '';  // Reset the display style to its default
+            // Ensure the "Select" checkbox is added to each row
+            const checkboxCell = row.querySelector("td:first-child");
+            if (checkboxCell && !checkboxCell.querySelector("input[type='checkbox']")) {
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.classList.add("select-checkbox");
+                checkboxCell.prepend(checkbox);
+            }
         });
         hiddenRows = [];  // Clear the hidden rows array
+
+        // Re-add the checkboxes to all rows (in case they weren't added for visible rows)
+        tableRows.forEach(row => {
+            const checkboxCell = row.querySelector("td:first-child");
+            if (checkboxCell && !checkboxCell.querySelector("input[type='checkbox']")) {
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.classList.add("select-checkbox");
+                checkboxCell.prepend(checkbox);
+            }
+        });
+
+        // Add "Status" column header if it's not already there
+        const thead = document.querySelector("#results-table thead");
+        let statusHeader = thead.querySelector("th.status-header");
+        if (!statusHeader) {
+            // Create the "Status" header if not present
+            statusHeader = document.createElement("th");
+            statusHeader.textContent = "Status"; // Add the Status text
+            statusHeader.classList.add("status-header"); // Add a class for identification
+
+            // Find the last header cell
+            const headerRow = thead.querySelector("tr");  // Assuming only one row for headers
+            const lastHeaderCell = headerRow.lastElementChild;
+
+            // Insert "Status" header before the last one
+            headerRow.insertBefore(statusHeader, lastHeaderCell);
+        }
 
         // Change the button text to "Filter Selections"
         filterButton.textContent = "Filter Selections";
@@ -841,7 +877,7 @@ function toggleFilterSelections() {
             }
         });
 
-        // Change the button text to "Restore all rows"
+        // Change the button text to "Show All Rows"
         filterButton.textContent = "Show All Rows";
     }
 }
