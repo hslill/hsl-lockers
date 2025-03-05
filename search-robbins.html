@@ -65,8 +65,19 @@
                     <!-- Filter checkbox for canceled requests -->
                     <label>
                         <input type="checkbox" id="show-canceled"> Show only canceled requests
-
                     </label>
+                    <br>
+                    <!-- Filter checkboxes for locker groups -->
+                <p style="font-weight: bold;"> Filter by library:
+                        <input type="checkbox" id="locker-group-1"> Lapidus Lockers # 1-31
+                </label>
+                <label>
+                        <input type="checkbox" id="locker-group-2"> Robbins Lockers # 32-39
+                </label>
+                <label>
+                        <input type="checkbox" id="locker-group-3"> Hollis Lockers # 40-48
+                </label>
+                </p>
                 </section>
                 
                 <section id="results-section">
@@ -362,6 +373,40 @@ document.getElementById("show-canceled").addEventListener("click", () => {
         searchTransactions(searchText);
     }
 });
+document.getElementById("locker-group-1").addEventListener("click", applyLockerFilter);
+document.getElementById("locker-group-2").addEventListener("click", applyLockerFilter);
+document.getElementById("locker-group-3").addEventListener("click", applyLockerFilter);
+
+function applyLockerFilter() {
+    const showGroup1 = document.getElementById("locker-group-1").checked;
+    const showGroup2 = document.getElementById("locker-group-2").checked;
+    const showGroup3 = document.getElementById("locker-group-3").checked;
+
+    const tableRows = document.querySelectorAll("#results-table tbody tr");
+
+    tableRows.forEach(row => {
+        const lockerCell = row.cells[1]; // The second column (index 1) contains "Locker #"
+        if (!lockerCell) return; // Skip if no cell found
+
+        const lockerNumber = parseInt(lockerCell.textContent.trim(), 10);
+
+        // Check if the locker belongs to one of the selected groups
+        const inGroup1 = lockerNumber >= 1 && lockerNumber <= 31;
+        const inGroup2 = lockerNumber >= 32 && lockerNumber <= 39;
+        const inGroup3 = lockerNumber >= 40 && lockerNumber <= 48;
+
+        if (
+            (showGroup1 && inGroup1) ||
+            (showGroup2 && inGroup2) ||
+            (showGroup3 && inGroup3) ||
+            (!showGroup1 && !showGroup2 && !showGroup3) // Show all if none selected
+        ) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
 
 // Reset search form functionality
 document.getElementById("resetSearchButton").addEventListener("click", function () {
@@ -369,6 +414,9 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
     document.getElementById("start-date").value = "";
     document.getElementById("end-date").value = "";
     document.getElementById("show-canceled").checked = false;
+    document.getElementById("locker-group-1").checked = false;
+    document.getElementById("locker-group-2").checked = false;
+    document.getElementById("locker-group-3").checked = false;
     searchTransactions(""); // Clear search results
 });
 
