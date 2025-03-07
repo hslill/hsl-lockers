@@ -824,7 +824,7 @@ display: none;
     border: 1px solid darkgray;
     font-size: 8pt;
     cursor: pointer;
-    width: 22px; /* Increased width by 20px */
+    width: 20px; /* Increased width by 20px */
     height: -100%; /* Height remains the same */
     margin: 0 auto; /* Center the toggle */
     text-align: center;
