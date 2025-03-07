@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Transactions</title>
     <link rel="stylesheet" href="css/styles-main.css">
-    <link rel="stylesheet" href="css/mobile-search.css">
+    <link rel="stylesheet" href="css/mobile-search.css"
     <!-- Add Tablesort library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
@@ -125,7 +125,7 @@
                 <!-- Button for resetting search -->
                 <div id="buttonContainer">
                     <input type="button" id="resetSearchButton" name="Reset" value="Reset">
-                    <a href="#" id="homeLink">Home</a>
+                    <a id="homeLink" href="index-hollis.html">Home</a>
                 </div>
             </main>
 
@@ -444,10 +444,15 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
             window.location.reload();
         });
 
-        document.getElementById("homeLink").addEventListener("click", (event) => {
-            event.preventDefault();  // Prevent default anchor behavior
-            window.location.href = "index-hollis.html";  // Redirect to home page (adjust the URL as needed)
+        document.addEventListener("DOMContentLoaded", () => {
+    const homeLink = document.getElementById("homeLink");
+    if (homeLink) {
+        homeLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.location.href = "index-hollis.html";
         });
+    }
+});
 
         // Shift rows to the right for export purposes
 function shiftRowsToRightForExport() {
