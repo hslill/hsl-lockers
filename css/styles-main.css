@@ -800,7 +800,7 @@ th.sortable:hover {
     position: fixed;
     width: 100%;
     background-color: #2b2b2b; /* Industrial dark gray background */
-    padding: 20px;       /* Add spacing for better structure */
+    padding: 10px;       /* Add spacing for better structure */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
     border-bottom: 2px solid #444; /* Adds an industrial-style bottom border */
   }
@@ -823,28 +823,18 @@ display: none;
     background-color: #444;
     color: white;
     border: 1px solid darkgray;
-    font-size: 12pt; /* Increased font size for better visibility */
+    font-size: 8pt;
     cursor: pointer;
-    width: 30px; /* Increased width for better visibility */
-    height: 30px; /* Adjusted height to make it more square */
+    width: 22px; /* Increased width by 20px */
+    height: -100%; /* Height remains the same */
     margin: 0 auto; /* Center the toggle */
     text-align: center;
     box-shadow: 1px 2px 5px #444;
     padding: 0;
-  }
+}
 
-  /* Make hamburger icon more visible by increasing size */
-  .hamburger-icon {
-    display: block; /* Show hamburger */
-    font-size: 26px; /* Adjust font size for better visibility */
-    color: white;
-    padding: 10px;
-    cursor: pointer;
-  }
 }
 
 .aside.active {
     display: block;
 }
-
-
