@@ -755,7 +755,7 @@ th.sortable:hover {
   /* Stack form labels over inputs */
   #notificationForm label {
       display: block;
-      margin-top: 20px;
+      margin-top: 50px;
   }
 
   /* Make buttons full width */
