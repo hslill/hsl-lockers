@@ -16,25 +16,91 @@
 </head>
 <body>
     <nav>
+        <div class="hamburger-icon">&#9776;</div> 
         <ul>
             <li><a href="index-robbins.html">Home</a></li>
             <li><a href="search-robbins.html">Search Transactions</a></li>
             <li><a href="user-index-robbins.html">User-end Page</a></li>
-                    <!-- New Hamburger Menu Link -->
-        <li class="dropdown">
-            <a href="javascript:void(0)" class="dropbtn">Other Branches</a>
-            <div class="dropdown-content">
-                <a href="index-lapidus.html">Lapidus Library</a>
-                <a href="index-hollis.html">Hollis Library</a>
-            </div>
-        </li>
-        <li><a href="#" id="help-link">Help</a></li>
-<!-- Hamburger Icon (appears when screen is smaller) -->
-<div class="hamburger-icon" onclick="toggleMenu()">
-    &#9776;
-</div>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Other Branches</a>
+                <div class="dropdown-content">
+                    <a href="index-lapidus.html">Lapidus Library</a>
+                    <a href="index-hollis.html">Hollis Library</a>
+                </div>
+            </li>
+            <li><a href="#" id="help-link">Help</a></li>
         </ul>
     </nav>
+    
+
+    <div class="container"></div>
+    <div style="display: flex;">
+        <!-- Side panel for lockers -->
+        <button class="aside-toggle">☰</button>
+        <aside class="aside">
+                <!-- NYU logo using a div with background-image -->
+        <div id="nyulogo" class="nyulogo">
+        <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
+    </div>
+            <main style="flex: 1; padding: 20px;">
+                <h1>Book Locker Notification System <br> Robbins Library</h1>
+            <h3>Locker Status</h3>
+            <ul id="lockerList" style="padding: 0; list-style: none;">
+                <!-- Example locker items -->
+                <li style="margin-bottom: 10px; padding: 10px; background-color: #e6f7ff; border: 1px solid #b3d8ff; border-radius: 5px;">
+                    <strong>Locker 1:</strong> Available
+                </li>
+                <li style="margin-bottom: 10px; padding: 10px; background-color: #ffe6e6; border: 1px solid #ffb3b3; border-radius: 5px;">
+                    <strong>Locker 2:</strong> In Use
+                </li>
+                <!-- Add more lockers dynamically -->
+            </ul>
+        </aside>
+    
+        <form id="notificationForm">
+            <label for="recipientName">Recipient Name:</label>
+            <input type="text" id="recipientNameField" name="recipientName" placeholder="Enter recipient's name" required>
+            
+            <input type="email" id="recipientEmailField" name="recipientEmail" placeholder="Recipient Email" required>
+    
+            <label for="isbnNumber">ISBN Number:</label>
+            <input type="text" id="isbnNumber" name="isbnNumber" placeholder="Enter ISBN number">
+            <button type="button" id="lookupButton">Lookup Book</button>
+       
+            <label for="bookDetailsField">Book Details:</label>
+            <textarea id="bookDetailsField" name="bookDetails" placeholder="Enter book details" required></textarea>
+            <div id="bookDetailsContainer" style="margin-top: 10px;"></div>
+    
+            <div id="isbnImageContainer" style="margin-top: 10px; display:none;">
+                <h3>Book Cover:</h3>
+                <img id="isbnImage" src="" alt="Book Image" style="max-width: 200px;">
+            </div>
+            
+            <label for="transactionNumberField">Transaction Number:</label>
+            <input type="text" id="transactionNumberField" name="transactionNumberField" placeholder="Transaction Number (TN)" maxlength="8" required>
+            
+            <!-- New button for assigning locker -->
+            <button type="button" id="assignLockerButton">Assign Locker</button>
+            
+            <!-- Hidden fields for locker number and combination -->
+            <input type="hidden" id="lockerNumberField" name="lockerNumber">
+            <input type="hidden" id="combinationField" name="combination">
+              
+            <button type="submit" id="sendButton">Send</button>
+            <button type="reset" id="resetButton">Reset</button>
+        </form>  
+    
+        <!-- Spinner for loading -->
+        <div id="loadingIndicator" style="display:none;">Loading...</div>
+    
+        <!-- Success or Failure Notifications -->
+        <div id="statusMessage" style="display:none;"></div>
+    
+        <div id="emailPreviewContainer">
+            <h2>Email Preview:</h2>
+            <div id="emailPreview" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;"></div>
+        </div>
+    </div>
     
       <!-- Content for logged-in users -->
       <div id="content">
@@ -57,72 +123,6 @@
       <p id="error-message" style="color: red;"></p>
     </div>
   </div>
-
-  <div style="display: flex;">
-    <!-- Side panel for lockers -->
-    <aside class="aside">
-            <!-- NYU logo using a div with background-image -->
-    <div id="nyulogo" class="nyulogo">
-    <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
-</div>
-        <main style="flex: 1; padding: 20px;">
-            <h1>Book Locker Notification System <br> Robbins Library</h1>
-        <h3>Locker Status</h3>
-        <ul id="lockerList" style="padding: 0; list-style: none;">
-            <!-- Example locker items -->
-            <li style="margin-bottom: 10px; padding: 10px; background-color: #e6f7ff; border: 1px solid #b3d8ff; border-radius: 5px;">
-                <strong>Locker 1:</strong> Available
-            </li>
-            <li style="margin-bottom: 10px; padding: 10px; background-color: #ffe6e6; border: 1px solid #ffb3b3; border-radius: 5px;">
-                <strong>Locker 2:</strong> In Use
-            </li>
-            <!-- Add more lockers dynamically -->
-        </ul>
-    </aside>
-
-    <form id="notificationForm">
-        <label for="recipientName">Recipient Name:</label>
-        <input type="text" id="recipientNameField" name="recipientName" placeholder="Enter recipient's name" required>
-        
-        <input type="email" id="recipientEmailField" name="recipientEmail" placeholder="Recipient Email" required>
-
-        <label for="isbnNumber">ISBN Number:</label>
-        <input type="text" id="isbnNumber" name="isbnNumber" placeholder="Enter ISBN number">
-        <button type="button" id="lookupButton">Lookup Book</button>
-   
-        <label for="bookDetailsField">Book Details:</label>
-        <textarea id="bookDetailsField" name="bookDetails" placeholder="Enter book details" required></textarea>
-        <div id="bookDetailsContainer" style="margin-top: 10px;"></div>
-
-        <div id="isbnImageContainer" style="margin-top: 10px; display:none;">
-            <h3>Book Cover:</h3>
-            <img id="isbnImage" src="" alt="Book Image" style="max-width: 200px;">
-        </div>
-        
-        <label for="transactionNumberField">Transaction Number:</label>
-        <input type="text" id="transactionNumberField" name="transactionNumberField" placeholder="Transaction Number (TN)" maxlength="8" required>
-        
-        <!-- New button for assigning locker -->
-        <button type="button" id="assignLockerButton">Assign Locker</button>
-        
-        <!-- Hidden fields for locker number and combination -->
-        <input type="hidden" id="lockerNumberField" name="lockerNumber">
-        <input type="hidden" id="combinationField" name="combination">
-          
-        <button type="submit" id="sendButton">Send</button>
-        <button type="reset" id="resetButton">Reset</button>
-    </form>  
-
-    <!-- Spinner for loading -->
-    <div id="loadingIndicator" style="display:none;">Loading...</div>
-
-    <!-- Success or Failure Notifications -->
-    <div id="statusMessage" style="display:none;"></div>
-
-    <div id="emailPreviewContainer">
-        <h2>Email Preview:</h2>
-        <div id="emailPreview" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;"></div>
-    </div>
 
 <!-- Popup container for showing locker details -->
 <div id="popup" class="popup">
@@ -163,12 +163,7 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
     const auth = getAuth(app); // Initialize Firebase Authentication
-
-function toggleMenu() {
-    const menu = document.querySelector('nav ul');
-    menu.classList.toggle('active');
-}
-    
+ 
 // Function to show the popup with locker details
 let isLockerStatusFetched = false;
 
@@ -903,6 +898,30 @@ document.getElementById('resetButton').addEventListener('click', function () {
         helpSidebar.style.right = '-100%';  // Slide the sidebar out
     });
     
+    document.addEventListener("DOMContentLoaded", function() {
+    document.querySelector(".hamburger-icon").addEventListener("click", toggleMenu);
+});
+    function toggleMenu() {
+    const menu = document.querySelector('nav ul');
+    menu.classList.toggle('active');
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const asideToggle = document.querySelector(".aside-toggle");
+    const aside = document.querySelector(".aside");
+
+    asideToggle.addEventListener("click", function() {
+        aside.classList.toggle("active");
+
+        // Toggle background color of the aside-toggle bar when collapsed/expanded
+        if (aside.classList.contains("active")) {
+            asideToggle.style.backgroundColor = "#444"; // when expanded
+        } else {
+            asideToggle.style.backgroundColor = "#444"; // default collapsed color (still #444)
+        }
+    });
+});
+
     </script>
         <!-- JavaScript files -->
         <script src="js/generateBarcode.js"></script>
