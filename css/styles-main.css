@@ -804,6 +804,22 @@ th.sortable:hover {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
     border-bottom: 2px solid #444; /* Adds an industrial-style bottom border */
   }
+
+    /* Sidebar styling */
+.help-sidebar {
+  position: fixed;
+  top: 0;
+  right: -550px; /* Ensure it's fully hidden initially */
+  width: 200px;
+  height: 100%;
+  background-color: #f1f1f1;
+  box-shadow: -2px 0 5px darkgray;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  overflow-y: auto; /* Enables vertical scrolling */
+  transition: right 0.3s ease;
+  z-index: 1000;
+  border: 3px solid lightgray; /* Frame around sidebar */
+    }
 }
 
 /* hide the aside toggle in regular display */
