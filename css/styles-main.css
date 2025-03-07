@@ -598,7 +598,6 @@ footer a:after {
 .dropdown-content {
   display: none;
   position: absolute;
-  left: 0;
   background-color: #2b2b2b;
   min-width: 160px;
   z-index: 1;
@@ -606,7 +605,7 @@ footer a:after {
 
 .dropdown-content a {
   color: white;
-  padding: 10px 14px;
+  padding: 10px 14px; /* Adjusted padding */
   text-decoration: none;
   display: block;
 }
@@ -615,55 +614,28 @@ footer a:after {
   display: block;
 }
 
-/* Hamburger Menu */
+/* Hamburger Menu - shown on smaller screens */
 .hamburger-icon {
   display: none;
   font-size: 30px;
   cursor: pointer;
   padding: 10px;
-  color: white;
 }
 
-/* Responsive Navigation */
-@media screen and (max-width: 768px) {
+/* Show the hamburger menu on smaller screens */
+@media screen and (max-width: 600px) {
   nav ul {
-    display: none;
-    flex-direction: column;
-    width: 100%;
+      display: none;
+      flex-direction: column;
   }
 
   nav ul.active {
-    display: flex;
+      display: flex;
   }
 
   .hamburger-icon {
-    display: block;
+      display: block;
   }
-
-  nav ul li {
-    text-align: center;
-  }
-
-  .dropdown-content {
-    position: static;
-    width: 100%;
-  }
-}
-
-/* Responsive Form */
-form {
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
-  max-width: 90%;
-  margin: auto;
-}
-
-/* Inputs and Buttons */
-input, textarea, button {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
 }
 
 .modal {
