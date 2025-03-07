@@ -1,0 +1,233 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+main {
+    padding: 10px;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+/* Layout Changes for Mobile View */
+@media screen and (max-width: 600px) {
+    header {
+        margin-bottom: 10px;
+    }
+
+    /* Ensure input fields and buttons take up the full width */
+    #search-section input, 
+    #search-section button, 
+    #results-count p, 
+    #export-buttons button, 
+    #buttonContainer input, 
+    #buttonContainer a {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+/* Ensure checkboxes align properly with text */
+#search-section label {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Adds a small space between checkbox and text */
+    font-size: 16px;
+}
+
+#search-section input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+/* Mobile View Adjustments */
+@media screen and (max-width: 600px) {
+    #search-section label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+    }
+
+    /* Ensure checkboxes align in a single line */
+    #search-section p {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    /* Keep checkboxes inline */
+    #search-section p label {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+}
+
+    #results-section {
+        margin-top: 20px;
+    }
+
+    #results-table {
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 20px;
+    }
+
+    #results-table th, #results-table td {
+        padding: 8px;
+        text-align: center;
+    }
+
+    /* Buttons for exporting CSV, PDF, and Print */
+    #export-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #export-buttons button {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 12px;
+    }
+
+    /* Input fields for dates */
+    #start-date, #end-date {
+        width: 100%;
+        padding: 8px;
+    }
+
+    /* Modal for editing record */
+    .modal-content {
+        padding: 15px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* Search Input Field */
+    #search-input {
+        width: 100%;
+        padding: 8px;
+    }
+
+    /* Locker group checkboxes */
+    #search-section label {
+        font-weight: normal;
+    }
+
+    /* Results count */
+    #results-count p {
+        font-size: 14px;
+        text-align: center;
+    }
+
+    /* Adjust modal close button position */
+    .close {
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    /* Button container */
+    #buttonContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #resetSearchButton {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    #resetSearchButton:hover {
+        background-color: #5836b8;
+    }
+
+    #homeLink {
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 601px) {
+    /* Desktop Styles */
+    #search-section input,
+    #search-section button,
+    #results-section,
+    #results-table {
+        width: auto;
+        margin: 10px auto;
+    }
+
+    /* Align export buttons */
+    #export-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    #export-buttons button {
+        width: 150px;
+        margin: 0;
+    }
+
+    #resetSearchButton {
+        width: auto;
+    }
+}
+
+/* Additional Styles for Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    overflow: auto;
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
