@@ -78,7 +78,8 @@
                     </label>
                     <label>
                         <input type="checkbox" id="locker-group-3"> Hollis Lockers # 40-48
-                    </label>                    
+                    </label>
+                    
                 </p>
                 </section>
                 
@@ -125,7 +126,7 @@
                 <!-- Button for resetting search -->
                 <div id="buttonContainer">
                     <input type="button" id="resetSearchButton" name="Reset" value="Reset">
-                    <a href="#" id="homeLink">Home</a>
+                    <a id="homeLink" href="index-robbins.html">Home</a>
                 </div>
             </main>
 
@@ -443,10 +444,16 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
             window.location.reload();
         });
 
-        document.getElementById("homeLink").addEventListener("click", (event) => {
-            event.preventDefault();  // Prevent default anchor behavior
-            window.location.href = "index-robbins.html";  // Redirect to home page (adjust the URL as needed)
+        document.addEventListener("DOMContentLoaded", () => {
+    const homeLink = document.getElementById("homeLink");
+    if (homeLink) {
+        homeLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            window.location.href = "index-robbins.html";
         });
+    }
+});
+
 
         // Shift rows to the right for export purposes
 function shiftRowsToRightForExport() {
