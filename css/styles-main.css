@@ -755,7 +755,7 @@ th.sortable:hover {
   /* Stack form labels over inputs */
   #notificationForm label {
       display: block;
-      margin-top: 10px;
+      margin-top: 20px;
   }
 
   /* Make buttons full width */
@@ -768,7 +768,7 @@ th.sortable:hover {
 /* Hamburger Menu */
 .hamburger-icon {
   display: none;
-  font-size: 30px;
+  font-size: 20px;
   cursor: pointer;
   padding: 5px;
   color: white;
@@ -785,7 +785,7 @@ th.sortable:hover {
       width: 100%;
       background-color: #2b2b2b;
       position: absolute;
-      top: 70px;
+      top: 60px;
       padding-left: 12px;
       left: 0;
       z-index: 1000;
