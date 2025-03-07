@@ -1,4 +1,3 @@
-david.desimone@nyulangone.org
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,8 +78,7 @@ david.desimone@nyulangone.org
                     </label>
                     <label>
                         <input type="checkbox" id="locker-group-3"> Hollis Lockers # 40-48
-                    </label>
-                    
+                    </label>                    
                 </p>
                 </section>
                 
@@ -127,7 +125,7 @@ david.desimone@nyulangone.org
                 <!-- Button for resetting search -->
                 <div id="buttonContainer">
                     <input type="button" id="resetSearchButton" name="Reset" value="Reset">
-                    <a id="homeLink" href="index-lapidus.html">Home</a>
+                    <a id="homeLink" href="index-hollis.html">Home</a>
                 </div>
             </main>
 
@@ -154,8 +152,8 @@ emailjs.init("qyLLqnBmF7BYPrdLZ");
                 // Check authentication status
                 onAuthStateChanged(auth, user => {
             if (!user) {
-                // If the user is not authenticated, redirect to login page (index-lapidus.html)
-                window.location.href = 'index-lapidus.html';
+                // If the user is not authenticated, redirect to login page (index-hollis.html)
+                window.location.href = 'index-hollis.html';
             } else {
                 // User is authenticated, proceed with loading the page
                 console.log("User is authenticated:", user.email);
@@ -378,7 +376,7 @@ document.getElementById("show-canceled").addEventListener("click", () => {
     }
 });
 
-        document.getElementById("locker-group-1").addEventListener("click", applyLockerFilter);
+document.getElementById("locker-group-1").addEventListener("click", applyLockerFilter);
 document.getElementById("locker-group-2").addEventListener("click", applyLockerFilter);
 document.getElementById("locker-group-3").addEventListener("click", applyLockerFilter);
 
@@ -412,7 +410,6 @@ function applyLockerFilter() {
         }
     });
 }
-
 
 // Reset search form functionality
 document.getElementById("resetSearchButton").addEventListener("click", function () {
@@ -452,11 +449,10 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
     if (homeLink) {
         homeLink.addEventListener("click", (event) => {
             event.preventDefault();
-            window.location.href = "index-lapidus.html";
+            window.location.href = "index-hollis.html";
         });
     }
 });
-
 
         // Shift rows to the right for export purposes
 function shiftRowsToRightForExport() {
