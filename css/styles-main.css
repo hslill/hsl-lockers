@@ -617,17 +617,17 @@ footer a:after {
 
 /* Hamburger Menu */
 .hamburger-icon {
-  display: none;
+  display: all;
   font-size: 30px;
   cursor: pointer;
-  padding: 10px;
+  padding: 20px;
   color: white;
 }
 
 /* Responsive Navigation */
 @media screen and (max-width: 768px) {
   nav ul {
-    display: none;
+    display: all;
     flex-direction: column;
     width: 100%;
   }
