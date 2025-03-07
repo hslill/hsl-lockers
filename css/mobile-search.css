@@ -164,6 +164,8 @@ h2 {
         margin-top: 10px;
         display: block;
         text-align: center;
+        pointer-events: auto !important; /* Ensure link clicks work */
+        
     }
 }
 
