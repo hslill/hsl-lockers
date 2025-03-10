@@ -36,11 +36,6 @@ h2 {
         margin-bottom: 10px;
     }
 
-.nyulogo {
-    position: absolute; /* or fixed */
-    top: 200px; /* Adjust based on previous top value */
-}
-
 /* Ensure checkboxes align properly with text */
 #search-section label {
     display: flex;
@@ -171,6 +166,16 @@ h2 {
         text-align: center;
         pointer-events: auto !important; /* Ensure link clicks work */
         
+    }
+}
+@media screen and (max-width: 600px) {
+    .nyulogo {
+        position: absolute; /* Ensures it moves independently */
+        top: 50px; /* Moves it higher (adjust this as needed) */
+        left: 50%; /* Centers the logo */
+        transform: translateX(-50%); /* Ensures perfect centering */
+        width: auto; /* Prevents unwanted scaling */
+        max-width: 80%; /* Ensures it doesn't take up too much space */
     }
 }
 
