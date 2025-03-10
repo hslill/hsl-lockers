@@ -188,7 +188,14 @@ h2 {
         width: auto;
         margin: 10px auto;
     }
-
+    .nyulogo {
+        position: absolute; /* Ensures it moves independently */
+        top: 200px; /* Moves it higher (adjust this as needed) */
+        left: 50%; /* Centers the logo */
+        transform: translateX(-50%); /* Ensures perfect centering */
+        width: auto; /* Prevents unwanted scaling */
+        max-width: 80%; /* Ensures it doesn't take up too much space */
+    }
     /* Align export buttons */
     #export-buttons {
         display: flex;
