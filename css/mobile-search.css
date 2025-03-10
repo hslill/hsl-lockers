@@ -171,7 +171,7 @@ h2 {
 @media screen and (max-width: 600px) {
     .nyulogo {
         position: absolute; /* Ensures it moves independently */
-        top: 0px; /* Moves it higher (adjust this as needed) */
+        top: 200px; /* Moves it higher (adjust this as needed) */
         left: 50%; /* Centers the logo */
         transform: translateX(-50%); /* Ensures perfect centering */
         width: auto; /* Prevents unwanted scaling */
