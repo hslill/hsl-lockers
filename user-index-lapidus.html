@@ -9,33 +9,35 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
         (function(){
-            emailjs.init("uxWxBkV6fbk7E2fvK");  // Replace YOUR_PUBLIC_KEY with your actual EmailJS public key
+            emailjs.init("qyLLqnBmF7BYPrdLZ");  // The actual EmailJS public key
         })(); 
         </script>
-       </head>
-       <body>
-        <div class="container">
-        <!-- NYU logo using a div with background-image -->
+    </head>
+<body>
+<!-- NYU logo using a div with background-image -->
         <div id="nyulogo" class="nyulogo">
-            <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
-           </div>
-               <h1>Book Locker Pickup</h1>
-               <p>Please scan or enter your Transaction Number to proceed.</p>
-               <div class="input-field">
-                   <input type="text" id="transactionNumber" placeholder="Transaction Number" maxlength="8" required>
-               </div>
-               <button class="button" id="submitButton">Submit</button>
-           </div>
-       
-           <!-- Popup for locker and combination -->
-           <div class="overlay" id="popupOverlay"></div>
-           <div class="popup" id="popup">
-               <h2>Locker Information</h2>
-               <p id="lockerInfo">Locker #: <strong>Placeholder Locker</strong></p>
-               <p id="combinationInfo">Combination: <strong>Placeholder Combination</strong></p>
-               <div id="pickupDateInfo"></div>
-               <button id="closeAndClearButton">Close</button>
-           </div>      
+     <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
+    </div>
+    <div class="container">
+        <h1>Book Locker Pickup</h1>
+        <p>Please scan or enter your Transaction Number to proceed.</p>
+        <div class="input-field">
+            <input type="text" id="transactionNumber" placeholder="Transaction Number" maxlength="8" required>
+        </div>
+        <button class="button" id="submitButton">Submit</button>
+    </div>
+
+    <!-- Popup for locker and combination -->
+    <div class="overlay" id="popupOverlay"></div>
+    <div class="popup" id="popup">
+        <h2>Locker Information</h2>
+        <p id="lockerInfo">Locker #: <strong>Placeholder Locker</strong></p>
+        <p id="combinationInfo">Combination: <strong>Placeholder Combination</strong></p>
+        <div id="pickupDateInfo"></div>
+        <button id="closeAndClearButton">Close</button>
+    </div>
+    <div id="bookDetailsInfo"></div>
+    <div id="updateButtonContainer"></div>
 
     <!-- Firebase SDK -->
     <script type="module">
