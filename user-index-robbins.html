@@ -5,13 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Locker Pickup System</title>
     <link rel="stylesheet" href="css/user-styles.css">
+    <link rel="stylesheet" href="css/mobile-search.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
         (function(){
             emailjs.init("qyLLqnBmF7BYPrdLZ");  // The actual EmailJS public key
         })(); 
         </script>
+<!-- NYU logo using a div with background-image -->
+        <div id="nyulogo" class="nyulogo">
+     <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
+    </div>
+</head>
+<body>
+    <div class="container">
+        <h1>Book Locker Pickup</h1>
+        <p>Please scan or enter your Transaction Number to proceed.</p>
+        <div class="input-field">
+            <input type="text" id="transactionNumber" placeholder="Transaction Number" maxlength="8" required>
+        </div>
+        <button class="button" id="submitButton">Submit</button>
+    </div>
 
+    <!-- Popup for locker and combination -->
+    <div class="overlay" id="popupOverlay"></div>
+    <div class="popup" id="popup">
+        <h2>Locker Information</h2>
+        <p id="lockerInfo">Locker #: <strong>Placeholder Locker</strong></p>
+        <p id="combinationInfo">Combination: <strong>Placeholder Combination</strong></p>
+        <div id="pickupDateInfo"></div>
+        <button id="closeAndClearButton">Close</button>
+    </div>
+    <div id="bookDetailsInfo"></div>
+    <div id="updateButtonContainer"></div>
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
@@ -439,34 +465,7 @@ document.getElementById("submitButton").addEventListener("click", function () {
         alert("Please enter a transaction number.");
     }
 });
-
     </script>
-<!-- NYU logo using a div with background-image -->
-        <div id="nyulogo" class="nyulogo">
-     <a href="https://hsl.med.nyu.edu" target="_blank"><img src="https://hsl.med.nyu.edu/sites/all/themes/nyuhsl/images/nyuhsl_identity.png" alt="NYU Logo" title="NYU Health Sciences Library"></a>
-    </div>
-</head>
-<body>
-    <div class="container">
-        <h1>Book Locker Pickup</h1>
-        <p>Please scan or enter your Transaction Number to proceed.</p>
-        <div class="input-field">
-            <input type="text" id="transactionNumber" placeholder="Transaction Number" maxlength="8" required>
-        </div>
-        <button class="button" id="submitButton">Submit</button>
-    </div>
-
-    <!-- Popup for locker and combination -->
-    <div class="overlay" id="popupOverlay"></div>
-    <div class="popup" id="popup">
-        <h2>Locker Information</h2>
-        <p id="lockerInfo">Locker #: <strong>Placeholder Locker</strong></p>
-        <p id="combinationInfo">Combination: <strong>Placeholder Combination</strong></p>
-        <div id="pickupDateInfo"></div>
-        <button id="closeAndClearButton">Close</button>
-    </div>
-    <div id="bookDetailsInfo"></div>
-    <div id="updateButtonContainer"></div>
     <script src="firebase-functions.js"></script>
 </body>
 </html>
