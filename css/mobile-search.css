@@ -36,6 +36,10 @@ h2 {
         margin-bottom: 10px;
     }
 
+.nyulogo {
+    top: 200px;
+}
+
 /* Ensure checkboxes align properly with text */
 #search-section label {
     display: flex;
