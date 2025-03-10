@@ -37,7 +37,8 @@ h2 {
     }
 
 .nyulogo {
-    top: 200px;
+    position: absolute; /* or fixed */
+    top: 150px; /* Adjust based on previous top value */
 }
 
 /* Ensure checkboxes align properly with text */
