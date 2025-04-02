@@ -60,19 +60,27 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-                // Function to check if user is authenticated
-                onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log('User is signed in:', user);
-                // User is signed in, you can proceed to use user information here
-                // For example, display user info, fetch user-specific data, etc.
-            } else {
-                console.log('No user is signed in');
-                // Redirect to login page if user is not authenticated
-                window.location.href = "index-robbins.html"; // Or any other action you'd like
-            }
-        });
-    
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Function to check if user is authenticated
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('User is signed in:', user);
+        // User is signed in, you can proceed to use user information here
+        // For example, display user info, fetch user-specific data, etc.
+    } else {
+        console.log('No user is signed in');
+        // Store the current URL
+        const currentUrl = window.location.href;
+        // Redirect to login page if user is not authenticated
+        window.location.href = "index.html?redirect=" + encodeURIComponent(currentUrl);
+        // encodeURIComponent ensures that the URL is properly encoded
+    }
+});
+        
         // Function to reset the page
         function resetPage() {
             const transactionInput = document.getElementById('transactionNumber');
