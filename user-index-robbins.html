@@ -39,8 +39,6 @@
     <div id="bookDetailsInfo"></div>
     <div id="updateButtonContainer"></div>
 
-    <!-- Content for logged-in users -->
-<div id="content">
 <!-- Login Form (Modal) -->
 <div id="login-form" class="modal">
     <div class="modal-content">
@@ -61,7 +59,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
         import { getFirestore, doc, getDoc, updateDoc, deleteField } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js';
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
     
         // Firebase Configuration
         const firebaseConfig = {
