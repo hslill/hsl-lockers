@@ -39,6 +39,24 @@
     <div id="bookDetailsInfo"></div>
     <div id="updateButtonContainer"></div>
 
+        <!-- Content for logged-in users -->
+<div id="content">
+<!-- Login Form (Modal) -->
+<div id="login-form" class="modal">
+    <div class="modal-content">
+        <h2>Login</h2>
+        <form id="login-form-inner">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required />
+            <label for="password">Password:</label>
+            <input type="password" id="password" required />
+            <button type="submit" id="login-button">Login</button>
+            <label>For HSL Staff Only. Permission by request.</label>
+        </form>
+        <p id="error-message" style="color: red;"></p>
+    </div>
+</div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
