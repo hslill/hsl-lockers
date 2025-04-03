@@ -139,6 +139,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+        z-index: 1010; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
 }
 
 /* Modal content */
