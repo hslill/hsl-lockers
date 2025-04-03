@@ -161,6 +161,7 @@ body {
 #login-form-inner label {
   font-weight: bold;
   text-align: left;
+  z-index: 5.0;
 }
 
 #login-form-inner input {
