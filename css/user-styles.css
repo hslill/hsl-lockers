@@ -150,7 +150,8 @@ body {
   width: 400px; /* Adjust based on screen size */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
-  z-index: 1010; /* Ensure it's higher */
+    z-index: 1010; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
 }
 
 /* Form styling */
