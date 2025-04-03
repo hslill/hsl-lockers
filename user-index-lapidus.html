@@ -92,49 +92,66 @@ function hideLoginModal() {
     }
 }
 
-// Handle login form submission
-document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('login-form');
     const errorMessage = document.getElementById('error-message');
+    const content = document.getElementById('content'); // Assuming 'content' is the main section that should be displayed after login
+    
+    // Check if elements exist before continuing
+    if (!loginForm || !errorMessage || !content) {
+        console.error('One or more required elements are missing from the HTML.');
+        return;
+    }
 
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-        hideLoginModal();
-        document.getElementById('content').style.display = 'block';
+    // Set Firebase persistence to LOCAL to retain login state across sessions
+    setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+            // Listen for authentication state changes
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log('User is signed in:', user);
+                    loginForm.style.display = 'none'; // Hide the login form
+                    content.style.display = 'block';  // Show the main content
+                } else {
+                    console.log('No user is signed in');
+                    loginForm.style.display = 'block'; // Show the login form
+                    content.style.display = 'none';    // Hide the main content
+                }
+            });
+        })
+        .catch((error) => {
+            console.log('Error with persistence setting:', error);
+        });
 
-        // Reload the page to reflect login status
-        setTimeout(() => location.reload(), 500);
+    // Handle login form submission
+    document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
         
-    } catch (error) {
-        switch (error.code) {
-            case 'auth/user-not-found':
-                errorMessage.textContent = 'No user found with this email.';
-                break;
-            case 'auth/wrong-password':
-                errorMessage.textContent = 'Incorrect password.';
-                break;
-            case 'auth/invalid-email':
-                errorMessage.textContent = 'Invalid email format.';
-                break;
-            default:
-                errorMessage.textContent = 'Login failed. Please try again.';
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            loginForm.style.display = 'none'; // Hide login modal
+            content.style.display = 'block';  // Show content
+
+            // Optionally reload page to reflect logged-in status
+            setTimeout(() => location.reload(), 500);
+        } catch (error) {
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage.textContent = 'No user found with this email.';
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage.textContent = 'Incorrect password.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage.textContent = 'Invalid email format.';
+                    break;
+                default:
+                    errorMessage.textContent = 'Login failed. Please try again.';
+            }
         }
-    }
-});
-        
-// Check authentication state
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log('User is signed in:', user);
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-    } else {
-        console.log('No user is signed in');
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('content').style.display = 'none';
-    }
+    });
 });
         
         // Function to reset the page
