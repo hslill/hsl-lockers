@@ -136,38 +136,6 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('content').style.display = 'none';
     }
 });
-
-// Handle login form submission
-document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessage = document.getElementById('error-message');
-
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-        hideLoginModal();
-        document.getElementById('content').style.display = 'block';
-
-        // Reload the page to reflect login status
-        setTimeout(() => location.reload(), 500);
-        
-    } catch (error) {
-        switch (error.code) {
-            case 'auth/user-not-found':
-                errorMessage.textContent = 'No user found with this email.';
-                break;
-            case 'auth/wrong-password':
-                errorMessage.textContent = 'Incorrect password.';
-                break;
-            case 'auth/invalid-email':
-                errorMessage.textContent = 'Invalid email format.';
-                break;
-            default:
-                errorMessage.textContent = 'Login failed. Please try again.';
-        }
-    }
-});   
         // Function to reset the page
         function resetPage() {
             const transactionInput = document.getElementById('transactionNumber');
