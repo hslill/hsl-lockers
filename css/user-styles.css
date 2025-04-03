@@ -148,6 +148,7 @@ body {
   width: 400px; /* Adjust based on screen size */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
+  z-index: 5.0;
 }
 
 /* Form styling */
