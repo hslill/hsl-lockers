@@ -76,26 +76,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-        // Set the persistence to LOCAL (default behavior)
-setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-        // Check the authentication state
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log('User is signed in:', user);
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            } else {
-                console.log('No user is signed in');
-                document.getElementById('login-form').style.display = 'block';
-                document.getElementById('content').style.display = 'none';
-            }
-        });
-    })
-    .catch((error) => {
-        console.log('Error with persistence setting:', error);
-    });
-
 // Function to show the login modal
 function showLoginModal() {
     const loginModal = document.getElementById('login-form');
@@ -111,6 +91,51 @@ function hideLoginModal() {
         loginModal.style.display = 'none'; // Hide the modal
     }
 }
+
+// Handle login form submission
+document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        hideLoginModal();
+        document.getElementById('content').style.display = 'block';
+
+        // Reload the page to reflect login status
+        setTimeout(() => location.reload(), 500);
+        
+    } catch (error) {
+        switch (error.code) {
+            case 'auth/user-not-found':
+                errorMessage.textContent = 'No user found with this email.';
+                break;
+            case 'auth/wrong-password':
+                errorMessage.textContent = 'Incorrect password.';
+                break;
+            case 'auth/invalid-email':
+                errorMessage.textContent = 'Invalid email format.';
+                break;
+            default:
+                errorMessage.textContent = 'Login failed. Please try again.';
+        }
+    }
+});
+        
+// Check authentication state
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('User is signed in:', user);
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+    } else {
+        console.log('No user is signed in');
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('content').style.display = 'none';
+    }
+});
 
 // Handle login form submission
 document.getElementById('login-form-inner').addEventListener('submit', async (e) => {
