@@ -60,19 +60,19 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-// Function to check if user is authenticated
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        console.log('User is signed in:', user);
-        // User is signed in, you can proceed to use user information here
-        // For example, display user info, fetch user-specific data, etc.
-    } else {
-        console.log('No user is signed in');
-        // Store the current URL
-        const currentUrl = window.location.href;
-        // Redirect to login page if user is not authenticated
-        window.location.href = "index-robbins.html?redirect=" + encodeURIComponent(currentUrl);
-        // encodeURIComponent ensures that the URL is properly encoded
+        console.log("User signed in:", user);
+        
+        // Get redirect URL from query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get("redirect");
+
+        if (redirectUrl) {
+            window.location.href = redirectUrl; // Redirect back to the original page
+        } else {
+            window.location.href = "user-index-robbins.html"; // Default fallback if no redirect parameter
+        }
     }
 });
         
