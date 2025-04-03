@@ -41,9 +41,6 @@
 
     <!-- Content for logged-in users -->
 <div id="content">
-    <button id="logout-button">Logout</button>
-</div>
-
 <!-- Login Form (Modal) -->
 <div id="login-form" class="modal">
     <div class="modal-content">
@@ -128,18 +125,7 @@ document.getElementById('login-form-inner').addEventListener('submit', async (e)
         }
     }
 });
-
-// Handle logout
-document.getElementById('logout-button').addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-        document.getElementById('content').style.display = 'none';
-        showLoginModal();
-    } catch (error) {
-        console.error("Error logging out:", error.message);
-    }
-});
-
+        
 // Check authentication state
 onAuthStateChanged(auth, (user) => {
     if (user) {
