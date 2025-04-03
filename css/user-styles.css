@@ -111,25 +111,26 @@ body {
     background-color: #ae4cf5 !important; /* Hover effect */
 }
 
+/* NYU logo style */
 .nyulogo {
-    position: fixed;
-    justify-content: center;
-    top: 30vh;
-    width: 200px;
-    height: 50px;  /* Set a height value */
-    z-index: 0;
-  }
-  
-  .nyulogo img {
-    width: 200px;
-    height: auto;
-  }
+  position: fixed;
+  justify-content: center;
+  top: 30vh;
+  width: 200px;
+  height: 50px;
+  z-index: -1; /* Move logo behind modal */
+}
+
+.nyulogo img {
+  width: 200px;
+  height: auto;
+}
 
 /* Style for the login modal */
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 1000; /* High z-index to ensure it's above other elements */
+  z-index: 10000; /* High z-index to ensure it's above other elements */
   left: 0;
   top: 0;
   width: 100%;
@@ -150,7 +151,7 @@ body {
   width: 400px; /* Adjust based on screen size */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
-    z-index: 1010; /* Ensure it's higher */
+  z-index: 10100; /* Ensure it's higher than other content */
   opacity: 1; /* Make sure it's fully opaque */
 }
 
@@ -166,7 +167,7 @@ body {
   text-align: left;
   background-color: white; /* Ensures text remains visible */
   padding: 2px;
-        z-index: 1010; /* Ensure it's higher */
+  z-index: 10100; /* Ensure it's higher */
   opacity: 1; /* Make sure it's fully opaque */
 }
 
@@ -177,7 +178,7 @@ body {
   font-size: 16px;
   width: 100%;
   background-color: white;
-        z-index: 1010; /* Ensure it's higher */
+  z-index: 10100; /* Ensure it's higher */
   opacity: 1; /* Make sure it's fully opaque */
 }
 
@@ -191,7 +192,7 @@ body {
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-        z-index: 1010; /* Ensure it's higher */
+  z-index: 10100; /* Ensure it's higher */
   opacity: 1; /* Make sure it's fully opaque */
 }
 
@@ -205,4 +206,3 @@ body {
   font-size: 14px;
   margin-top: 5px;
 }
-
