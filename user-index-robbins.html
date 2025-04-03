@@ -76,26 +76,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Set the persistence to LOCAL (default behavior)
-setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-        // Check the authentication state
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log('User is signed in:', user);
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            } else {
-                console.log('No user is signed in');
-                document.getElementById('login-form').style.display = 'block';
-                document.getElementById('content').style.display = 'none';
-            }
-        });
-    })
-    .catch((error) => {
-        console.log('Error with persistence setting:', error);
-    });
-
 // Function to show the login modal
 function showLoginModal() {
     const loginModal = document.getElementById('login-form');
@@ -143,7 +123,19 @@ document.getElementById('login-form-inner').addEventListener('submit', async (e)
         }
     }
 });
-
+        
+// Check authentication state
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log('User is signed in:', user);
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+    } else {
+        console.log('No user is signed in');
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('content').style.display = 'none';
+    }
+});
         // Function to reset the page
         function resetPage() {
             const transactionInput = document.getElementById('transactionNumber');
