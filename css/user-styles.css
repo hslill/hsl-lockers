@@ -166,6 +166,8 @@ body {
   text-align: left;
   background-color: white; /* Ensures text remains visible */
   padding: 2px;
+        z-index: 1010; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
 }
 
 #login-form-inner input {
@@ -175,6 +177,8 @@ body {
   font-size: 16px;
   width: 100%;
   background-color: white;
+        z-index: 1010; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
 }
 
 /* Login button */
@@ -187,6 +191,8 @@ body {
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
+        z-index: 1010; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
 }
 
 #login-button:hover {
