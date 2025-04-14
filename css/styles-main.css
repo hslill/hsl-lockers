@@ -510,6 +510,10 @@ label .login-form {
 
 }
 
+#login-form {
+  z-index: 5000;
+}
+
 .aside {
   margin-top: 20px;
   min-width: 275px;
