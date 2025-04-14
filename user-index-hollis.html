@@ -76,6 +76,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+document.addEventListener("DOMContentLoaded", function () {
+
 // Function to show the login modal
 function showLoginModal() {
     const loginModal = document.getElementById('login-form');
@@ -518,7 +520,8 @@ document.getElementById("submitButton").addEventListener("click", function () {
         alert("Please enter a transaction number.");
     }
 });
-
+    });
+        
     </script>
 
 </body>
