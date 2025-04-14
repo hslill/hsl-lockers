@@ -123,8 +123,8 @@ body {
 /* NYU logo style */
 .nyulogo {
   position: fixed;
-  justify-content: center;
-  top: 30vh;
+  top: 20px;
+  left: 20px; /* Moves it 20px from the left */
   width: 200px;
   height: 50px;
   z-index: -1; /* Move logo behind modal */
