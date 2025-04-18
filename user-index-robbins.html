@@ -253,24 +253,11 @@ async function fetchLockerDetails(transactionNumber) {
             document.getElementById('combinationInfo').innerHTML = `Combination: <strong>${combination}</strong>`;
             document.getElementById('pickupDateInfo').innerHTML = `Date of Pickup: <strong>${pickupDate}</strong>`; // Add pickup date to the popup
 
-            // Add editable book details field
-            const bookDetailsField = `<textarea id="bookDetailsTextarea">${data.bookDetails || ""}</textarea>`;
-            document.getElementById('bookDetailsInfo').innerHTML = `Book Details: ${bookDetailsField}`;
-
-            // Add an update button to save changes
-            const updateButton = `<button id="updateBookDetailsButton">Update Book Details</button>`;
-            document.getElementById('updateButtonContainer').innerHTML = updateButton;
-
             // Check if the locker is in use, and update status if necessary
             if (lockerStatus === "in-use") {
                 await updateLockerStatus(transactionNumber, lockerNumber); // Update the status
             }
 
-            // Add event listener to the update button
-            document.getElementById('updateBookDetailsButton').addEventListener('click', async () => {
-                const updatedBookDetails = document.getElementById('bookDetailsTextarea').value;
-                await updateBookDetails(transactionNumber, updatedBookDetails);
-            });
         } else {
             alert("Transaction not found. Please try again.");
             resetPage();
