@@ -1,26 +1,58 @@
+@font-face {
+  font-family: 'BentonSans';
+  src: url('path/to/BentonSans-Regular.woff2') format('woff2'),
+       url('path/to/BentonSans-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Global Styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'BentonSans', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #580f8b;
+    background-color: white;
     color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
+
+.banner {
+  position:fixed;
+  background-color: #580f8b;
+  top: 0px;
+  width: 100%;
+  height: 250px;
+  z-index: 5;
+}
+
 .container {
     background: #fff;
+    border: 1px solid darkgray;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 1 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     max-width: 300px;
     text-align: center;
 }
-.container h1 {
+.container h2 {
     font-size: 1.8rem;
     margin-bottom: 20px;
 }
+
+.library-header h1 {
+  position: fixed;
+  color: white;
+  font-size: 1.5rem;
+  left: 250px;
+  top: 108px;
+  width: 500px;
+  height: 50px;  /* Set a height value */
+  z-index: 1000;
+}
+
 .input-field {
     margin: 20px 0;
 }
@@ -111,16 +143,98 @@ body {
     background-color: #ae4cf5 !important; /* Hover effect */
 }
 
+/* NYU logo style */
 .nyulogo {
-    position: fixed;
-    justify-content: center;
-    top: 30vh;
-    width: 200px;
-    height: 50px;  /* Set a height value */
-    z-index: 1000;
-  }
-  
-  .nyulogo img {
-    width: 200px;
-    height: auto;
-  }
+  position: fixed;
+  top: 20px;
+  left: 20px; /* Moves it 20px from the left */
+  width: 200px;
+  height: 50px;
+  z-index: -1; /* Move logo behind modal */
+}
+
+.nyulogo img {
+  width: 200px;
+  height: auto;
+}
+
+/* Style for the login modal */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 10000; /* High z-index to ensure it's above other elements */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+  backdrop-filter: blur(10px); /* Blurs background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal content */
+.modal-content {
+  position: relative;
+  background-color: #fff !important; /* Force solid white */
+  padding: 25px;
+  border-radius: 10px;
+  width: 400px; /* Adjust based on screen size */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  z-index: 10100; /* Ensure it's higher than other content */
+  opacity: 1; /* Make sure it's fully opaque */
+}
+
+/* Form styling */
+#login-form-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#login-form-inner label {
+  font-weight: bold;
+  text-align: left;
+  background-color: white; /* Ensures text remains visible */
+  padding: 2px;
+  z-index: 10100; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
+}
+
+#login-form-inner input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%;
+  background-color: white;
+  z-index: 10100; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
+}
+
+/* Login button */
+#login-button {
+  background-color: #5c67f2;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  z-index: 10100; /* Ensure it's higher */
+  opacity: 1; /* Make sure it's fully opaque */
+}
+
+#login-button:hover {
+  background-color: #4a54e1;
+}
+
+/* Error message */
+#error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
