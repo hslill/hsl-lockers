@@ -313,6 +313,7 @@ nav {
   padding: 15px 20px;       /* Add spacing for better structure */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
   border-bottom: 2px solid #444; /* Adds an industrial-style bottom border */
+  z-index: 6000;
 }
 
 nav ul {
