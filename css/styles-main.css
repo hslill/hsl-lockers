@@ -552,11 +552,12 @@ footer {
   border-top: 2px solid #444;
   box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.5);
   width: 100%; /* Full width */
-  z-index: 1000;
+  z-index: 5000;
   position: fixed; /* Fixes the footer to the bottom */
   bottom: 0; /* Sticks to the bottom of the viewport */
   left: 0; /* Ensures it covers the entire width */
   transition: all 0.3s ease-in-out;
+
 }
 
 /* Styling for <a> elements inside the footer */
@@ -806,10 +807,10 @@ th.sortable:hover {
       width: 100%;
       background-color: #2b2b2b;
       position: absolute;
-      top: 60px;
-      padding-left: 12px;
+      padding: 12px;
+      top: 30px;
       left: 0;
-      z-index: 1000;
+      z-index: 6000;
   }
 
   nav ul.active {
@@ -824,6 +825,11 @@ th.sortable:hover {
     padding: 2px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
     border-bottom: 2px solid #444; /* Adds an industrial-style bottom border */
+    z-index: 6000;
+  }
+
+  footer {
+    z-index: 2000;
   }
 
     /* Sidebar styling */
