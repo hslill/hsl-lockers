@@ -407,13 +407,12 @@ function sendPickupEmail(recipientName, bookDetails, transactionNumber) {
     };
 
     // Send the email using EmailJS to notify the staff
-    emailjs.send("pickup", "pickup_receipt_robbins", emailParams)
+    emailjs.send("book_pickup_robbins", "pickup_receipt_robbins", emailParams)
         .then((response) => {
             console.log("Email sent successfully!", response.status, response.text);
         })
         .catch((error) => {
             console.error("Error sending email:", error);
-            alert("Failed to send pickup confirmation.");
         });
 }
 
