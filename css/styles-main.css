@@ -107,36 +107,6 @@ button:active, #search-button:active, .filterButton:active, #search-button:activ
   transform: scale(0.98);
 }
 
-/* Specific reset button and home link styles */
-#resetSearchButton {
-  display: block;
-  margin: 0 auto;
-  margin-top: 10px;
-  transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
-}
-
-#homeLink {
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  margin: 0 auto;
-  width: fit-content;
-  transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
-}
-
-/* Hover state for Reset button and Home link */
-#reset-home-buttons #resetSearchButton:hover,
-#reset-home-buttons #homeLink:hover {
-  background-color: #ae4cf5;
-}
-
-/* Active state (click) for both */
-#reset-home-buttons #resetSearchButton:active,
-#reset-home-buttons #homeLink:active {
-  transform: scale(0.98);
-}
-
-/* Center both buttons in the container */
 #buttonContainer {
   display: flex;
   flex-direction: column;
@@ -144,8 +114,44 @@ button:active, #search-button:active, .filterButton:active, #search-button:activ
   margin-top: 10px;
 }
 
-#resetSearchButton, #homeLink {
-  margin: 0 5px;  /* Adds space between the buttons */
+/* Export buttons row */
+#export-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Reset + Home buttons row */
+#reset-home-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* Shared button/link styling */
+#resetSearchButton,
+#homeLink {
+  background-color: #580f8b !important;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#resetSearchButton:hover,
+#homeLink:hover {
+  background-color: #ae4cf5 !important;
+}
+
+#resetSearchButton:active,
+#homeLink:active {
+  transform: scale(0.98);
 }
 
 #bookDetails {
@@ -465,25 +471,6 @@ th.sortable.desc::after {
 /* Active effect for buttons */
 export-buttons .btn{
   transform: scale(0.98);
-}
-
-#reset-home-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-#reset-home-buttons .btn,
-#resetSearchButton {
-  background-color: #580f8b;
-  color: white;
-  border: none;
-  padding: 8px 18px;
-  font-size: 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  text-decoration: none;
 }
 
 /* Style for the login modal */
