@@ -102,11 +102,6 @@ button:hover, #search-button:hover {
   background-color: #ae4cf5;
 }
 
-/* Active effect for buttons */
-button:active, #search-button:active, .filterButton:active, #search-button:active {
-  transform: scale(0.98);
-}
-
 #buttonContainer {
   display: flex;
   flex-direction: column;
@@ -122,9 +117,15 @@ button:active, #search-button:active, .filterButton:active, #search-button:activ
   flex-wrap: wrap;
 }
 
+#export-buttons #export-csv, 
+#export-buttons #export-pdf, 
+#export-buttons #print-results {
+width: 125px;
+}
+
 /* Reset + Home buttons row */
 #reset-home-buttons {
-  display: flex;
+  display: block; /* changed from block to flex */
   justify-content: center;
   gap: 15px;
   margin-top: 15px;
@@ -141,7 +142,17 @@ button:active, #search-button:active, .filterButton:active, #search-button:activ
   border-radius: 5px;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.3s, transform 0.2s;
+  text-align: center;
+  width: 120px; /* increased slightly for visibility */
+  transition: background-color 0.3s;
+  display: inline-block; /* ensure consistent box sizing */
+  line-height: normal; /* helps with alignment in Firefox */
+}
+
+#homeLink {
+  height: 21px; /* match height of reset button */
+  line-height: 21px; /* vertically center text */
+  width: 50px;
 }
 
 #resetSearchButton:hover,
