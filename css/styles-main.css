@@ -700,7 +700,7 @@ th.sortable:hover {
   overflow-x: auto; /* Enables horizontal scrolling */
   overflow-y: auto; /* Enables vertical scrolling */
   transition: right 0.3s ease;
-  z-index: 1000;
+  z-index: 6000;
   border: 3px solid lightgray; /* Frame around sidebar */
 }
 
@@ -725,10 +725,10 @@ th.sortable:hover {
 
 #close-sidebar {
   position: absolute;
-  top: 10px;
+  top: 50px;
   right: 10px;
   background-color: transparent;
-  color: white;
+  color: black;
   border: none;
   font-size: 20px;
   cursor: pointer;
