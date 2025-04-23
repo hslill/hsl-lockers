@@ -109,24 +109,32 @@
                     </div>
                 </section>
         
-                <!-- Buttons for exporting CSV, PDF, and Print -->
-                <div id="export-buttons">
-                    <button id="export-csv" class="btn">
-                        <i class="fas fa-file-csv"></i> Export
-                    </button>
-                    <button id="export-pdf" class="btn">
-                        <i class="fas fa-file-pdf"></i> Download
-                    </button>
-                    <button id="print-results" class="btn">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                </div>
-        
-                <!-- Button for resetting search -->
                 <div id="buttonContainer">
-                    <input type="button" id="resetSearchButton" name="Reset" value="Reset">
-                    <a id="homeLink" href="index-hollis.html">Home</a>
-                </div>
+                    <!-- Buttons for exporting CSV, PDF, and Print -->
+                    <div id="export-buttons">
+                      <button id="export-csv" class="btn">
+                        <i class="fas fa-file-csv"></i> Export
+                      </button>
+                      <button id="export-pdf" class="btn">
+                        <i class="fas fa-file-pdf"></i> Download
+                      </button>
+                      <button id="print-results" class="btn">
+                        <i class="fas fa-print"></i> Print
+                      </button>
+                    </div>
+                  
+                    <!-- New container for Reset and Home -->
+                    <div id="reset-home-buttons">
+                      <input
+                        type="button"
+                        id="resetSearchButton"
+                        name="Reset"
+                        value="Reset"
+                        style="background-color: #580f8b !important; padding: 8px 18px; font-size: 14px; color: white; border: none; border-radius: 5px;"
+                      />
+                      <a id="homeLink" href="index-hollis.html" class="btn">Home</a>
+                    </div>
+                  </div>  
             </main>
 
     <script type="module">
