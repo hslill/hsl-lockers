@@ -150,8 +150,8 @@ width: 125px;
 }
 
 #homeLink {
-  height: 21px; /* match height of reset button */
-  line-height: 21px; /* vertically center text */
+  height: 20px; /* match height of reset button */
+  line-height: 20px; /* vertically center text */
   width: 50px;
 }
 
