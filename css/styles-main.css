@@ -85,7 +85,7 @@ form button {
 }
 
 /* Style for button, reset button, and search button */
-button, #resetButton, #resetSearchButton, #search-button, #homeLink {
+button, #resetButton, .filterButton, #search-button{
   background-color: #580f8b;
   color: white;
   font-size: 1.2em;
@@ -98,12 +98,12 @@ button, #resetButton, #resetSearchButton, #search-button, #homeLink {
 }
 
 /* Hover effect for buttons */
-button:hover, #resetSearchButton:hover, #search-button:hover, #homeLink:hover {
+button:hover, #search-button:hover {
   background-color: #ae4cf5;
 }
 
 /* Active effect for buttons */
-button:active, #resetSearchButton:active, #search-button:active, #homeLink:active {
+button:active, #search-button:active, .filterButton:active, #search-button:active {
   transform: scale(0.98);
 }
 
@@ -112,6 +112,7 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
   display: block;
   margin: 0 auto;
   margin-top: 10px;
+  transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
 }
 
 #homeLink {
@@ -120,20 +121,32 @@ button:active, #resetSearchButton:active, #search-button:active, #homeLink:activ
   text-decoration: none;
   margin: 0 auto;
   width: fit-content;
+  transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
+}
+
+/* Hover state for Reset button and Home link */
+#reset-home-buttons #resetSearchButton:hover,
+#reset-home-buttons #homeLink:hover {
+  background-color: #ae4cf5;
+}
+
+/* Active state (click) for both */
+#reset-home-buttons #resetSearchButton:active,
+#reset-home-buttons #homeLink:active {
+  transform: scale(0.98);
 }
 
 /* Center both buttons in the container */
 #buttonContainer {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   margin-top: 10px;
 }
 
 #resetSearchButton, #homeLink {
-  margin: 0 10px;  /* Adds space between the buttons */
+  margin: 0 5px;  /* Adds space between the buttons */
 }
-
 
 #bookDetails {
   height: 150px;
@@ -420,22 +433,24 @@ th.sortable.desc::after {
   border-top: 4px solid #000; /* Upward arrow */
 }
 
-#export-buttons {
+#export-buttons{
   display: flex;
   justify-content: center;
-  gap: 15px; /* Space between buttons */
-  padding: 10px 0; /* Add some padding to the top and bottom */
+  align-items: center; /* Ensures vertical alignment */
+  gap: 4px; /* Reduced space between buttons */
+  flex-wrap: wrap; /* Allow wrapping if needed on smaller screens */
 }
 
-#export-buttons .btn {
-  background-color: #580f8b; /* Background for buttons to match other buttons */
-  color: white; /* White text color */
-  border: none; /* Remove borders */
-  padding: 8px 15px; /* Padding inside the buttons */
-  font-size: 14px; /* Adjust font size */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s, transform 0.2s; /* Smooth hover effect */
+#export-buttons, #homeLink.btn {
+  background-color: white;
+  color: white;
+  border: none;
+  padding: 6px 12px; /* Slightly reduced padding */
+  font-size: 14px; /* Slightly smaller font */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin: 0; /* Ensure no extra spacing */
 }
 
 #export-buttons .btn:hover {
@@ -450,6 +465,25 @@ th.sortable.desc::after {
 /* Active effect for buttons */
 export-buttons .btn{
   transform: scale(0.98);
+}
+
+#reset-home-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+#reset-home-buttons .btn,
+#resetSearchButton {
+  background-color: #580f8b;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 /* Style for the login modal */
@@ -637,7 +671,7 @@ footer a:after {
 .modal {
   display: none;
   position: fixed;
-  z-index: 1000;
+  z-index: 6000;
   left: 0;
   top: 0;
   width: 100%;
@@ -651,6 +685,10 @@ footer a:after {
   padding: 20px;
   width: 50%;
   border-radius: 5px;
+}
+
+edit-modal {
+  z-index: 6000;
 }
 
 /* Make sure the text area is scrollable and resizable */
