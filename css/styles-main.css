@@ -456,7 +456,7 @@ export-buttons .btn{
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  z-index: 6000; /* Sit on top */
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -465,12 +465,30 @@ export-buttons .btn{
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+#edit-modal {
+  position: fixed; /* Ensure it’s taken out of normal flow */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6000; /* This sets the stacking order */
+  background-color: rgba(0, 0, 0, 0.5); /* Optional: overlay effect */
+  display: none; /* Keep hidden until triggered */
+}
+
 .modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
   border: 1px solid #888;
   width: 500px; /* Could be more or less, depending on screen size */
+}
+
+#edit-modal .modal-content {
+  background: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  z-index: 6001; /* Just in case you want to layer it above the backdrop */
 }
 
 #logout-button {
