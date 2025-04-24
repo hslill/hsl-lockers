@@ -529,7 +529,7 @@ export-buttons .btn{
   top: 10px; /* Adjust for spacing from the top */
   right: 10px; /* Adjust for spacing from the right */
   background-color: #580f8b;
-  color: #580f8b;
+  color: white;
   font-weight: bold;
   border: none;
   cursor: pointer;
