@@ -523,20 +523,21 @@ export-buttons .btn{
   z-index: 6001; /* Just in case you want to layer it above the backdrop */
 }
 
-.logoutButton #logout-button {
-  position: relative; /* Stays in the same position regardless of scrolling */
-  top: 10px; /* Adjust for spacing from the top */
-  right: 10px; /* Adjust for spacing from the right */
-  background-color: #580f8b;
+#logout-button {
+  position: fixed; /* Stays in place when scrolling */
+  top: 10px; /* Distance from top */
+  right: 10px; /* Distance from right */
+  padding: 8px 12px; /* Add some padding for usability */
+  background-color: #444;
   color: white;
   font-weight: bold;
-  border: none;
   cursor: pointer;
+  z-index: 7002;
 }
 
 #logout-button:hover {
-  color: #ae4cf5; /* Slightly darker on hover */
-  background-color: none;
+  color: #ae4cf5;
+  background-color: #444
 }
 
 .logoutButton #logout-button:hover {
