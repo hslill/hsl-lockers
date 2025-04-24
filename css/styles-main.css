@@ -532,7 +532,7 @@ export-buttons .btn{
   color: white;
   border: none;
   cursor: pointer;
-  z-index: 6002;
+  z-index: 7002;
 }
 
 #logout-button:hover {
