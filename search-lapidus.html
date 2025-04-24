@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Transactions</title>
     <link rel="stylesheet" href="css/styles-main.css">
-    <link rel="stylesheet" href="css/mobile-search.css"
+    <link rel="stylesheet" href="css/mobile-search.css">
     <!-- Add Tablesort library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
@@ -21,7 +21,10 @@
             <input type="text" id="edit-barcode" placeholder="Barcode URL">
     
             <label for="edit-locker">Locker #:</label>
-            <input type="text" id="edit-locker" readonly>
+            <input type="text" id="edit-locker">
+
+            <label for="edit-combination">Combo #:</label>
+            <input type="text" id="edit-combination">
     
             <label for="edit-book">Book Details:</label>
             <textarea id="edit-book" rows="4" style="resize: both; overflow: auto;"></textarea>         
@@ -78,7 +81,8 @@
                     </label>
                     <label>
                         <input type="checkbox" id="locker-group-3"> Hollis Lockers # 40-48
-                    </label>                    
+                    </label>
+                    
                 </p>
                 </section>
                 
@@ -87,6 +91,7 @@
                         <thead>
                             <tr>
                                 <th>Locker #</th>
+                                <th>Combo #</th>
                                 <th>Transaction Number</th>
                                 <th>Date Received</th>
                                 <th>Date Picked Up</th>
@@ -159,8 +164,8 @@ emailjs.init("qyLLqnBmF7BYPrdLZ");
                 // Check authentication status
                 onAuthStateChanged(auth, user => {
             if (!user) {
-                // If the user is not authenticated, redirect to login page (index-hollis.html)
-                window.location.href = 'index-hollis.html';
+                // If the user is not authenticated, redirect to login page (index-robbins.html)
+                window.location.href = 'index-lapidus.html';
             } else {
                 // User is authenticated, proceed with loading the page
                 console.log("User is authenticated:", user.email);
@@ -221,8 +226,12 @@ emailjs.init("qyLLqnBmF7BYPrdLZ");
 
     const fieldsToSearch = [
         data.bookDetails,
+        data.dateReceived,
+        data.dateCanceled,
         data.recipientEmail,
         data.recipientName,
+        data.lockerNumber,
+        data.combination,
         doc.id
     ];
 
@@ -243,6 +252,7 @@ if (!includeCanceled) {
         row.innerHTML = `
             <td><input type="checkbox" class="select-checkbox"></td>  <!-- ✅ Checkbox added here -->
             <td>${data.lockerNumber}</td>
+            <td>${data.combination || "N/A"}</td>
             <td>${doc.id}</td>
             <td>${dateReceived ? formatDate(data.dateReceived) : "N/A"}</td>
             <td>${datePickedup ? formatDate(data.datePickedup) : "N/A"}</td>
@@ -252,8 +262,8 @@ if (!includeCanceled) {
             <td>${data.recipientName || "N/A"}</td>
             <td>${lockerStatus}</td>
             <td>${cancelButton}</td>
-            <td><button class="edit-btn" data-doc-id="${doc.id}" data-locker="${data.lockerNumber}" data-book="${data.bookDetails}" 
-        data-email="${data.recipientEmail}" data-name="${data.recipientName}" data-transaction-number="${data.transactionNumber}">Edit</button></td>
+            <td><button class="edit-btn" data-doc-id="${doc.id}" data-locker="${data.lockerNumber}" data-combination="${data.combination}" data-book="${data.bookDetails}" 
+        data-email="${data.recipientEmail}" data-name="${data.recipientName}" data-transaction-number="${doc.id}">Edit</button></td>
         `;
     }
 } else {
@@ -279,8 +289,8 @@ if (!includeCanceled) {
             <td>${data.recipientName || "N/A"}</td>
             <td>${lockerStatus}</td>
             <td>${cancelButton}</td>
-            <td><button class="edit-btn" data-doc-id="${doc.id}" data-locker="${data.lockerNumber}" data-book="${data.bookDetails}" 
-        data-email="${data.recipientEmail}" data-name="${data.recipientName}" data-transaction-number="${data.transactionNumber}">Edit</button></td>
+            <td><button class="edit-btn" data-doc-id="${doc.id}" data-locker="${data.lockerNumber}" data-combination="${data.combination}" data-book="${data.bookDetails}" 
+        data-email="${data.recipientEmail}" data-name="${data.recipientName}" data-transaction-number="${doc.id}">Edit</button></td>
         `;
     }
 }
@@ -368,12 +378,13 @@ document.getElementById("search-button").addEventListener("click", () => {
     searchTransactions(searchText);
 });
 
-        document.getElementById("search-button").addEventListener("keydown", (event) => {
+document.getElementById("search-button").addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {  // Check for Enter or Space
         event.preventDefault();  // Prevent unintended scrolling
         document.getElementById("search-button").click();  // Trigger the search
     }
 });
+
 
 let initialSearchPerformed = false;
 
@@ -389,7 +400,6 @@ document.getElementById("show-canceled").addEventListener("click", () => {
         searchTransactions(searchText);
     }
 });
-
 document.getElementById("locker-group-1").addEventListener("click", applyLockerFilter);
 document.getElementById("locker-group-2").addEventListener("click", applyLockerFilter);
 document.getElementById("locker-group-3").addEventListener("click", applyLockerFilter);
@@ -463,10 +473,11 @@ document.getElementById("resetSearchButton").addEventListener("click", function 
     if (homeLink) {
         homeLink.addEventListener("click", (event) => {
             event.preventDefault();
-            window.location.href = "index-hollis.html";
+            window.location.href = "index-lapidus.html";
         });
     }
 });
+
 
         // Shift rows to the right for export purposes
 function shiftRowsToRightForExport() {
@@ -554,7 +565,8 @@ function exportToPDF() {
             const rowData = {};
             row.querySelectorAll("td").forEach((cell, index) => {
                 const header = [
-                    "Locker #", 
+                    "Locker #",
+                    "Combo #",
                     "Transaction Number", 
                     "Date Received", 
                     "Date Picked Up",
@@ -694,6 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
             currentDocId = btn.dataset.docId; 
 
             document.getElementById("edit-locker").value = btn.dataset.locker;
+            document.getElementById("edit-combination").value = btn.dataset.combination;
             document.getElementById("edit-book").value = btn.dataset.book;
             document.getElementById("edit-email").value = btn.dataset.email;
             document.getElementById("edit-name").value = btn.dataset.name;
@@ -717,6 +730,7 @@ saveEditBtn.addEventListener("click", async () => {
     if (currentDocId) {
         const updatedData = {
             transactionNumber: document.getElementById("edit-transaction").value,
+            combination: document.getElementById("edit-combination").value,
             barcodeUrl: document.getElementById("edit-barcode").value,
             bookDetails: document.getElementById("edit-book").value,
             recipientEmail: document.getElementById("edit-email").value,
@@ -769,6 +783,7 @@ saveEditBtn.addEventListener("click", async () => {
         const recipientEmail = document.getElementById('edit-email').value.trim();
         const bookDetails = document.getElementById('edit-book').value.trim();
         const lockerNumber = document.getElementById('edit-locker').value.trim();
+        const combination = document.getElementById('edit-combination').value.trim();
 
         // Ensure all necessary fields are filled before sending email
         if (!recipientName || !recipientEmail || !bookDetails || !lockerNumber) {
@@ -777,13 +792,13 @@ saveEditBtn.addEventListener("click", async () => {
         }
 
         console.log("Save button clicked. Sending email if checkbox is checked...");
-        sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber);
+        sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber, combination);
     });
 });
 
 
 // Function to send email
-function sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber) {
+function sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber, combination) {
     const notifyRecipientCheckbox = document.getElementById('notifyRecipientCheckbox');
     
     if (!notifyRecipientCheckbox) {
@@ -810,13 +825,14 @@ function sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber) {
         recipientEmail,
         bookDetails,
         lockerNumber,
+        combination,
         transactionNumberField: transactionNumber, // Matches EmailJS template
         barcode_url: barcodeUrl  // Matches EmailJS template
     };
 
     console.log("Sending email with data:", emailData);
 
-    emailjs.send("pickup", "book_pickup_robbins", emailData)
+    emailjs.send("pickup", "book_pickup_lapidus", emailData)
         .then((response) => {
             console.log('Email sent successfully!', response);
             alert('Email sent successfully!');
@@ -826,7 +842,7 @@ function sendEmail(recipientName, recipientEmail, bookDetails, lockerNumber) {
             alert('Failed to send email!');
         });
 }
-
+        
 let hiddenRows = []; // Array to store hidden rows
 
 function addSelectColumn() {
@@ -954,7 +970,6 @@ function toggleFilterSelections() {
 
 // Run function after table is populated
 document.addEventListener("DOMContentLoaded", addSelectColumn);
-        
     </script>
 
     <!-- Add Tablesort JS -->
