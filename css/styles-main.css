@@ -527,7 +527,7 @@ export-buttons .btn{
   all: unset; /* Removes default button styles */
   position: fixed; /* Stays in the same position regardless of scrolling */
   top: 50px; /* Adjust for spacing from the top */
-  right: 10px; /* Adjust for spacing from the right */
+  right: 20px; /* Adjust for spacing from the right */
   background-color: #580f8b;
   color: white;
   border: none;
