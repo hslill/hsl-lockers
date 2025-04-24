@@ -1,5 +1,5 @@
 // Initialize EmailJS
-emailjs.init("-GTLg_lADOC6F4kog");  // Replace with your actual public key
+emailjs.init("-GTLg_lADOC6F4kog");
 
 function sendEmail() {
     // Form submission event listener
