@@ -407,7 +407,7 @@ function sendPickupEmail(recipientName, bookDetails, transactionNumber) {
     };
 
     // Send the email using EmailJS to notify the staff
-    emailjs.send("book_pickup_hollis", "pickup_receipt_hollis", emailParams)
+    emailjs.send("pickup", "pickup_receipt_hollis", emailParams)
         .then((response) => {
             console.log("Email sent successfully!", response.status, response.text);
         })
